@@ -1,0 +1,35 @@
+spring:
+  profiles.active: local  
+---
+  
+spring:
+  profiles: local
+  datasource:
+   driverClassName: oracle.jdbc.OracleDriver
+   url: jdbc:oracle:thin:@localhost:1521:xe
+   username: ticketing
+   password: d1t1b1se
+    
+server:
+  port: 8090
+logging:
+  level:
+    com.emc.eve: INFO
+---
+spring:
+  profiles: cloud
+  
+
+---
+db:
+ postgre:
+    DB_URL: jdbc:oracle:thin:@localhost:1521:xe
+    DB_USER: ticketing
+    DB_PASSWORD: d1t1b1se
+---
+   
+csvList:
+  customDateFormatsSupported: dd/MM/yyyy HH:mm:ss.SSSSSSS
+  
+   
+  
