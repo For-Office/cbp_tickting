@@ -6,7 +6,7 @@
 	<artifactId>cbp_ticketing</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>cbp_ticketing</name>
-	<packaging>war</packaging>
+<packaging>war</packaging>
 	<parent>
 
 		<groupId>org.springframework.boot</groupId>
@@ -82,16 +82,8 @@
 			<artifactId>jsch</artifactId>
 			<version>0.1.31</version>
 		</dependency>
-		<dependency>
-				<groupId>org.apache.xmlbeans</groupId>
-				<artifactId>xmlbeans</artifactId>
-				<version>3.1.0</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.poi</groupId>
-				<artifactId>poi-ooxml</artifactId>
-				<version>3.15</version>
-			</dependency> 
+
+
 
 
 	</dependencies>
@@ -104,6 +96,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
+		
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>

@@ -1,5 +1,6 @@
 package com.cbp.ticketing.action.implService;
 
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class TicketingServiceImpl implements TicketingService {
 		return flag;
 	}
 
-	public boolean deleteTicketApp(TicketApp ticketApp) {
+	public boolean deleteTicketApp(TicketApp ticketApp)throws SQLException {
 		boolean flag = service.deleteTicketApp(ticketApp);
 		return flag;
 	}

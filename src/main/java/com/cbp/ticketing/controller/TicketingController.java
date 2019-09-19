@@ -1,5 +1,6 @@
 package com.cbp.ticketing.controller;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cbp.ticketing.action.implService.TicketingServiceImpl;
+import com.cbp.ticketing.common.ErrorCodes;
 import com.cbp.ticketing.model.ResponseBodyHelper;
 import com.cbp.ticketing.model.TicketApp;
 import com.cbp.ticketing.model.TicketEnvResTeamApp;
@@ -41,6 +43,8 @@ public class TicketingController {
 
 	@Autowired
 	TicketingServiceImpl ticket;
+	@Autowired
+	ErrorCodes errorcodes;
 
 	@PostMapping(path = "/login")
 	public ResponseEntity<?> login(@RequestBody UserLogin user) {
@@ -56,7 +60,8 @@ public class TicketingController {
 		} else {
 			responseBody.setStatusCode(String.valueOf(HttpStatus.NON_AUTHORITATIVE_INFORMATION));
 			responseBody.setReqStatus("failed");
-			responseBody.setMessage(unknown);
+			System.out.println("........" + errorcodes.getERRORS_LOOKUP_UNKNOWN());
+			responseBody.setMessage(errorcodes.getERRORS_LOOKUP_UNKNOWN());
 		}
 		return ResponseEntity.ok(responseBody);
 
@@ -66,20 +71,12 @@ public class TicketingController {
 	@PostMapping(path = "/saveTicketApp")
 	public ResponseEntity<?> saveTicketApp(@RequestBody TicketApp ticketApp) {
 		ResponseBodyHelper responseBody = new ResponseBodyHelper();
-		/*
-		 * logger.info("AppName Name" + ticketApp.getAppName());
-		 */ List names = ticketApp.getAppNames();
-		logger.info("List of TicketAppNames.." + names);
-		for (int i = 0; i < names.size(); i++) {
-			TicketApp TicketApps = new TicketApp();
-			String name = names.get(i).toString();
-			System.out.println("name...." + name);
-			TicketApps.setAppName(name);
-			ticket.createTicketApp(TicketApps);
-		}
+		ticketApp.getAppNames();
+		logger.info("List of TicketAppNames.." + ticketApp.getAppNames());
+		ticket.createTicketApp(ticketApp);
 		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 		responseBody.setReqStatus("success");
-		responseBody.setMessage("Record(s) Saved");
+		responseBody.setMessage(errorcodes.getERRORS_NEWAPPLICATIONCREATION_SUCCESS());
 		return ResponseEntity.ok(responseBody);
 	}
 
@@ -88,6 +85,8 @@ public class TicketingController {
 		ResponseBodyHelper responseBody = new ResponseBodyHelper();
 		List<TicketApp> ticketAppList = new ArrayList<TicketApp>();
 		ticketAppList = ticket.getTicketAppList();
+		logger.info("displaying ticketApplication List ...." + ticketAppList);
+
 		if (ticketAppList.size() > 0) {
 			responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 			responseBody.setReqStatus("success");
@@ -109,7 +108,7 @@ public class TicketingController {
 		if (flag) {
 			responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 			responseBody.setReqStatus("success");
-			responseBody.setMessage("updated successfuly");
+			responseBody.setMessage(errorcodes.getERRORS_APPLICATIONUPDATED_SUCCES());
 		} else {
 			responseBody.setReqStatus("failed");
 			responseBody.setMessage("updated failed");
@@ -120,10 +119,16 @@ public class TicketingController {
 	@PostMapping(path = "/deleteTicketApp")
 	public ResponseEntity<?> deleteTicketApp(@RequestBody TicketApp ticketApp) {
 		ResponseBodyHelper responseBody = new ResponseBodyHelper();
-		ticket.deleteTicketApp(ticketApp);
-		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
-		responseBody.setReqStatus("success");
-		responseBody.setMessage("AppTicket is deleted");
+		try {
+			ticket.deleteTicketApp(ticketApp);
+			responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
+			responseBody.setReqStatus("success");
+			responseBody.setMessage(errorcodes.getERRORS_DELETEAPPLICATION_SUCCES());
+		} catch (SQLException sqlException) {
+			responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
+			responseBody.setReqStatus("failed");
+			responseBody.setMessage(errorcodes.getERRORS_DELETEAPPLICATION_FAILURE());
+		}
 		return ResponseEntity.ok(responseBody);
 	}
 
@@ -134,7 +139,7 @@ public class TicketingController {
 		ticket.createTicketTeam(ticketTeam);
 		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 		responseBody.setReqStatus("success");
-		responseBody.setMessage("TicketTeam Record Saved");
+		responseBody.setMessage(errorcodes.getERRORS_NEWTEAMCREATION_SUCCESS());
 		return ResponseEntity.ok(responseBody);
 	}
 
@@ -164,7 +169,7 @@ public class TicketingController {
 		ticket.updateTicketTeam(ticketTeam);
 		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 		responseBody.setReqStatus("success");
-		responseBody.setMessage("updated successfuly");
+		responseBody.setMessage(errorcodes.getERRORS_NEWTEAMUPDATED_SUCCESS());
 		return ResponseEntity.ok(responseBody);
 	}
 
@@ -174,7 +179,7 @@ public class TicketingController {
 		ticket.deleteTicketTeam(ticketTeam);
 		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 		responseBody.setReqStatus("success");
-		responseBody.setMessage("TicketTeamis deleted");
+		responseBody.setMessage(errorcodes.getERRORS_DELETEAPPLICATION_SUCCES());
 		return ResponseEntity.ok(responseBody);
 
 	}
@@ -187,7 +192,7 @@ public class TicketingController {
 		ticket.createTicketRes(ticketResource);
 		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 		responseBody.setReqStatus("success");
-		responseBody.setMessage("TicketRes Record Saved");
+		responseBody.setMessage(errorcodes.getERRORS_NEWRESOURCECREATION_SUCCESS());
 		return ResponseEntity.ok(responseBody);
 	}
 
@@ -216,7 +221,7 @@ public class TicketingController {
 		ticket.updateTicketResource(ticketRes);
 		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 		responseBody.setReqStatus("success");
-		responseBody.setMessage("updated successfuly");
+		responseBody.setMessage(errorcodes.getERRORS_RESOURCEUPDATED_SUCCESS());
 		return ResponseEntity.ok(responseBody);
 	}
 
@@ -226,7 +231,7 @@ public class TicketingController {
 		ticket.deleteTicketResource(ticketRes);
 		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 		responseBody.setReqStatus("success");
-		responseBody.setMessage("TicketResource is deleted");
+		responseBody.setMessage(errorcodes.getERRORS_DELETERESOURCE_SUCCESS());
 		return ResponseEntity.ok(responseBody);
 
 	}
@@ -240,7 +245,7 @@ public class TicketingController {
 		ticket.createTicketEnvType(ticketEnvType);
 		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 		responseBody.setReqStatus("success");
-		responseBody.setMessage("TicketEnvType Record Saved");
+		responseBody.setMessage(errorcodes.getCREATE_ENVIRONMENT_SUCCESS());
 		return ResponseEntity.ok(responseBody);
 	}
 
@@ -269,7 +274,7 @@ public class TicketingController {
 		ticket.updateTicketEnvType(ticketEnvType);
 		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 		responseBody.setReqStatus("success");
-		responseBody.setMessage("updated successfuly");
+		responseBody.setMessage(errorcodes.getUPDATE_ENVIRONMENT_SUCCESS());
 		return ResponseEntity.ok(responseBody);
 	}
 
@@ -279,7 +284,7 @@ public class TicketingController {
 		ticket.deleteTicketEnvType(ticketEnvType);
 		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 		responseBody.setReqStatus("success");
-		responseBody.setMessage("TicketEnvType is deleted");
+		responseBody.setMessage(errorcodes.getDELETE_ENVIRONMENT_SUCCESS());
 		return ResponseEntity.ok(responseBody);
 
 	}
@@ -402,7 +407,7 @@ public class TicketingController {
 
 	}
 
-	@PostMapping(path = "/getResCredentials")
+	@PostMapping(path = "/" + "#")
 	public ResponseEntity<?> getResCredentials(@RequestBody TicketResource ticketResource) {
 		ResponseBodyHelper responseBody = new ResponseBodyHelper();
 		List<TicketResCredentials> TicketResCredentialsList = new ArrayList<TicketResCredentials>();

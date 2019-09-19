@@ -7,11 +7,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import com.cbp.ticketing.Utility.ReUtils;
+import com.cbp.ticketing.controller.TicketingController;
 import com.cbp.ticketing.dao.daoService.TicketingDaoService;
 import com.cbp.ticketing.model.TicketApp;
 import com.cbp.ticketing.model.TicketEnvResTeamApp;
@@ -28,10 +32,10 @@ public class TicketingImpl implements TicketingDaoService {
 	JdbcDAO jdbcDAO;
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-
-	Connection connection = null;
+	private static final Logger logger = LoggerFactory.getLogger(TicketingController.class);
+	/*Connection connection = null;
 	PreparedStatement statement = null;
-	ResultSet resultSet = null;
+	ResultSet resultSet = null;*/
 
 	/*
 	 * @PostConstruct public void initialize() throws SQLException { connection =
@@ -67,14 +71,23 @@ public class TicketingImpl implements TicketingDaoService {
 //TicketApp Querys 
 
 	public void createTicketApp(TicketApp ticketApp) {
-		int id = getMaxId("APP_ID", "cbp_TKT_APP") + 1;
-		ticketApp.setAppId(id);
+		int id;
 		String QUERY = "INSERT into CBP_TKT_APP(APP_ID,APP_NAME,CBP_CREATED_TIMESTAMP,CBP_UPDATED_TIMESTAMP) values(? , ? , ? , ?)";
-		Object[] a = new Object[] { ticketApp.getAppId(), ticketApp.getAppName(), ticketApp.getCreatedDate(),
-				ticketApp.getModifiedDate() };
-		jdbcTemplate.update(QUERY, a);
-	}
-
+		 id = getMaxId("APP_ID", "cbp_TKT_APP") + 1;
+		  List<Object[]> inputList = new ArrayList<Object[]>();
+		  List list=ticketApp.getAppNames();
+	     for(int i=0;i<list.size();i++) {
+	    	 ticketApp.setAppId(id);	
+	    	 logger.info("Application name"+list.get(i).toString());
+	    	 ticketApp.setAppName(list.get(i).toString());
+	            Object[] tmp = {ticketApp.getAppId(), ticketApp.getAppName(), ticketApp.getCreatedDate(),
+	    				ticketApp.getModifiedDate()};
+	            inputList.add(tmp);
+	            id++;
+	     }
+	     jdbcTemplate.batchUpdate(QUERY, inputList); 
+	    }
+	
 	public List<TicketApp> getTicketAppList() {
 		List<TicketApp> ticketAppList = null;
 		try {
@@ -112,7 +125,7 @@ public class TicketingImpl implements TicketingDaoService {
 		return flag;
 	}
 
-	public boolean deleteTicketApp(TicketApp ticketApp) {
+	public boolean deleteTicketApp(TicketApp ticketApp)throws SQLException {
 		boolean flag = false;
 		String DELETE_QUERY = "delete from CBP_TKT_APP where APP_ID=" + ticketApp.getAppId();
 		flag = true;
@@ -374,7 +387,8 @@ public class TicketingImpl implements TicketingDaoService {
 		return ticketResList;
 
 	}
-	public List<TicketResCredentials> getResCredentials(TicketResource ticketResource){
+
+	public List<TicketResCredentials> getResCredentials(TicketResource ticketResource) {
 		String QUERY = "SELECT * FROM CBP_TKT_RES_CRED WHERE RES_ID IN (SELECT RES_ID FROM CBP_TKT_RES where RES_TYPE_ID= ?)";
 
 		List<TicketResCredentials> TicketResCredentialsList = new ArrayList<TicketResCredentials>();
@@ -397,12 +411,17 @@ public class TicketingImpl implements TicketingDaoService {
 
 	public int getMaxId(String columnName, String tableName) {
 		StringBuilder MAX_ID_QUERY = new StringBuilder();
+		int maxIdValue;
 		MAX_ID_QUERY.append("SELECT max(");
 		MAX_ID_QUERY.append(columnName);
 		MAX_ID_QUERY.append(") as max_id FROM ");
 		MAX_ID_QUERY.append(tableName);
 		String maxId = MAX_ID_QUERY.toString();
-		int maxIdValue = jdbcTemplate.queryForObject(maxId, null, Integer.class);
+		try {
+			maxIdValue = jdbcTemplate.queryForObject(maxId, null, Integer.class);
+		} catch (NullPointerException e) {
+			maxIdValue = 0;
+		}
 		return maxIdValue;
 	}
 }

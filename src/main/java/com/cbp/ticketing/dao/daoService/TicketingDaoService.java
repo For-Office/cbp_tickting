@@ -1,5 +1,6 @@
 package com.cbp.ticketing.dao.daoService;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import com.cbp.ticketing.model.TicketApp;
@@ -21,7 +22,7 @@ public interface TicketingDaoService {
 
 	public boolean updateTicketApp(TicketApp ticketApp);
 
-	public boolean deleteTicketApp(TicketApp ticketApp);
+	public boolean deleteTicketApp(TicketApp ticketApp)throws SQLException;
 
 	// TicketTeam
 	public void createTicketTeam(TicketTeam ticketTeam);

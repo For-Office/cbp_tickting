@@ -1,5 +1,6 @@
 package com.cbp.ticketing.action.service;
 
+import java.sql.SQLException;
 import java.util.List;
 import com.cbp.ticketing.model.TicketApp;
 import com.cbp.ticketing.model.TicketEnvResTeamApp;
@@ -11,7 +12,7 @@ import com.cbp.ticketing.model.TicketTeam;
 import com.cbp.ticketing.model.UserLogin;
 
 public interface TicketingService {
-	public List<UserLogin>  login(UserLogin user);
+	public List<UserLogin> login(UserLogin user);
 
 //TeamApp 
 	public void createTicketApp(TicketApp ticketApp);
@@ -20,7 +21,7 @@ public interface TicketingService {
 
 	public boolean updateTicketApp(TicketApp ticketApp);
 
-	public boolean deleteTicketApp(TicketApp ticketApp);
+	public boolean deleteTicketApp(TicketApp ticketApp) throws SQLException;
 
 //TicketTeam
 	public void createTicketTeam(TicketTeam ticketTeam);
@@ -57,8 +58,12 @@ public interface TicketingService {
 	public void updateTicketEnvType(TicketEnvType ticketEnvType);
 
 	public List<TicketEnvType> getTicketEnvType();
+
 	public List<TicketApp> getAppNames(TicketTeam ticketTeam);
+
 	public List<TicketEnvType> getEnvTypes(TicketEnvResTeamApp ticketEnvResTeamApp);
+
 	public List<TicketResource> getResNames(TicketEnvResTeamApp ticketEnvResTeamApp);
+
 	public List<TicketResCredentials> getResCredentials(TicketResource ticketResource);
 }

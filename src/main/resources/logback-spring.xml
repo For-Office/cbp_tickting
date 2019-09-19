@@ -13,7 +13,7 @@
 
 	<appender name="LOGS_FILE"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${LOGS}/undraleu-logger.log</file>
+		<file>C:/Users/rames/Desktop/undraleu-logger.log</file>
 		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
 			<Pattern>%d %p %C{1.} [%t] %m%n</Pattern>
 		</encoder>
