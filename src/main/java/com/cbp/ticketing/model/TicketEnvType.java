@@ -1,12 +1,14 @@
 package com.cbp.ticketing.model;
 
 import java.util.Date;
+import java.util.List;
 
 public class TicketEnvType {
 	private int envTypeId;
 	private String envTypeName;
 	private Date createdDate;
 	private Date modifiedDate;
+	private List envTypeNames;
 	public Date getCreatedDate() {
 		return createdDate;
 	}
@@ -30,6 +32,18 @@ public class TicketEnvType {
 	}
 	public void setEnvTypeName(String envTypeName) {
 		this.envTypeName = envTypeName;
+	}
+	/**
+	 * @return the envTypeNames
+	 */
+	public List getEnvTypeNames() {
+		return envTypeNames;
+	}
+	/**
+	 * @param envTypeNames the envTypeNames to set
+	 */
+	public void setEnvTypeNames(List envTypeNames) {
+		this.envTypeNames = envTypeNames;
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.cbp.ticketing.model;
 
 import java.util.Date;
+import java.util.List;
 
 public class TicketResource {
 	private int resId;
@@ -8,6 +9,8 @@ public class TicketResource {
 	private int resTypeId;
 	private Date createdDate;
 	private Date modifiedDate;
+	private List resNames;
+	private List<Integer> resTypeIds;
 	public Date getCreatedDate() {
 		return createdDate;
 	}
@@ -38,5 +41,29 @@ public class TicketResource {
 	public void setResTypeId(int resTypeId) {
 		this.resTypeId = resTypeId;
 	}
-
+	/**
+	 * @return the resNames
+	 */
+	public List getResNames() {
+		return resNames;
+	}
+	/**
+	 * @param resNames the resNames to set
+	 */
+	public void setResNames(List resNames) {
+		this.resNames = resNames;
+	}
+	/**
+	 * @return the resTypeIds
+	 */
+	public List<Integer> getResTypeIds() {
+		return resTypeIds;
+	}
+	/**
+	 * @param resTypeIds the resTypeIds to set
+	 */
+	public void setResTypeIds(List<Integer> resTypeIds) {
+		this.resTypeIds = resTypeIds;
+	}
+	
 }

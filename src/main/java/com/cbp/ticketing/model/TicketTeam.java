@@ -1,12 +1,14 @@
 package com.cbp.ticketing.model;
 
 import java.util.Date;
+import java.util.List;
 
 public class TicketTeam {
 	private int teamId;
 	private String teamName;
 	private Date createdDate;
 	private Date modifiedDate;
+	private List teamNames;
 	public Date getCreatedDate() {
 		return createdDate;
 	}
@@ -30,6 +32,18 @@ public class TicketTeam {
 	}
 	public void setTeamName(String teamName) {
 		this.teamName = teamName;
+	}
+	/**
+	 * @return the teamNames
+	 */
+	public List getTeamNames() {
+		return teamNames;
+	}
+	/**
+	 * @param teamNames the teamNames to set
+	 */
+	public void setTeamNames(List teamNames) {
+		this.teamNames = teamNames;
 	}
 
 }

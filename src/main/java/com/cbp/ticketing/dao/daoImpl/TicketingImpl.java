@@ -1,13 +1,11 @@
 
+
 package com.cbp.ticketing.dao.daoImpl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,20 +26,13 @@ import com.cbp.ticketing.model.UserLogin;
 
 @Repository
 public class TicketingImpl implements TicketingDaoService {
-	@Autowired
-	JdbcDAO jdbcDAO;
+
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	private static final Logger logger = LoggerFactory.getLogger(TicketingController.class);
-	/*Connection connection = null;
-	PreparedStatement statement = null;
-	ResultSet resultSet = null;*/
 
-	/*
-	 * @PostConstruct public void initialize() throws SQLException { connection =
-	 * jdbcDAO.getDevDatabaseConection(); }
-	 */
 	public List<UserLogin> login(UserLogin user) {
+
 		String QUERY = "SELECT * FROM cbp_user_security WHERE cbp_user_name = ? AND cbp_user_password = ?";
 		List<UserLogin> users = null;
 		try {
@@ -71,23 +62,24 @@ public class TicketingImpl implements TicketingDaoService {
 //TicketApp Querys 
 
 	public void createTicketApp(TicketApp ticketApp) {
+		String Query_Check = "SELECT * FROM CBP_TKT_APP WHERE APP_NAME = ?";
 		int id;
 		String QUERY = "INSERT into CBP_TKT_APP(APP_ID,APP_NAME,CBP_CREATED_TIMESTAMP,CBP_UPDATED_TIMESTAMP) values(? , ? , ? , ?)";
-		 id = getMaxId("APP_ID", "cbp_TKT_APP") + 1;
-		  List<Object[]> inputList = new ArrayList<Object[]>();
-		  List list=ticketApp.getAppNames();
-	     for(int i=0;i<list.size();i++) {
-	    	 ticketApp.setAppId(id);	
-	    	 logger.info("Application name"+list.get(i).toString());
-	    	 ticketApp.setAppName(list.get(i).toString());
-	            Object[] tmp = {ticketApp.getAppId(), ticketApp.getAppName(), ticketApp.getCreatedDate(),
-	    				ticketApp.getModifiedDate()};
-	            inputList.add(tmp);
-	            id++;
-	     }
-	     jdbcTemplate.batchUpdate(QUERY, inputList); 
-	    }
-	
+		id = getMaxId("APP_ID", "cbp_TKT_APP") + 1;
+		List<Object[]> inputList = new ArrayList<Object[]>();
+		List list = ticketApp.getAppNames();
+		for (int i = 0; i < list.size(); i++) {
+			ticketApp.setAppId(id);
+			logger.info("Application name" + list.get(i).toString());
+			ticketApp.setAppName(list.get(i).toString());
+			Object[] tmp = { ticketApp.getAppId(), ticketApp.getAppName(), ticketApp.getCreatedDate(),
+					ticketApp.getModifiedDate() };
+			inputList.add(tmp);
+			id++;
+		}
+		jdbcTemplate.batchUpdate(QUERY, inputList);
+	}
+
 	public List<TicketApp> getTicketAppList() {
 		List<TicketApp> ticketAppList = null;
 		try {
@@ -103,11 +95,9 @@ public class TicketingImpl implements TicketingDaoService {
 					return ticketApp;
 				}
 			});
-
 		} catch (Exception e) {
 
 		}
-
 		return ticketAppList;
 	}
 
@@ -125,7 +115,7 @@ public class TicketingImpl implements TicketingDaoService {
 		return flag;
 	}
 
-	public boolean deleteTicketApp(TicketApp ticketApp)throws SQLException {
+	public boolean deleteTicketApp(TicketApp ticketApp) throws SQLException {
 		boolean flag = false;
 		String DELETE_QUERY = "delete from CBP_TKT_APP where APP_ID=" + ticketApp.getAppId();
 		flag = true;
@@ -136,19 +126,23 @@ public class TicketingImpl implements TicketingDaoService {
 	// TicketTeam Querys
 
 	public void createTicketTeam(TicketTeam ticketTeam) {
-		try {
-			int id = getMaxId("TEAM_ID", "CBP_TKT_TEAM") + 1;
-			ticketTeam.setTeamId(id);
+			int id;
 			String QUERY = "INSERT into CBP_TKT_TEAM(TEAM_ID,TEAM_NAME,CBP_CREATED_TIMESTAMP,CBP_UPDATED_TIMESTAMP) values(? , ? , ? , ?)";
-			Object[] a = new Object[] { ticketTeam.getTeamId(), ticketTeam.getTeamName(), ticketTeam.getCreatedDate(),
-					ticketTeam.getModifiedDate() };
-			jdbcTemplate.update(QUERY, a);
-		} catch (Exception e) {
-			e.printStackTrace();
+			id = getMaxId("TEAM_ID", "CBP_TKT_TEAM") + 1;
+			List<Object[]> inputList = new ArrayList<Object[]>();
+			List list = ticketTeam.getTeamNames();
+			for (int i = 0; i < list.size(); i++) {
+				ticketTeam.setTeamId(id);;
+				logger.info("Application name" + list.get(i).toString());
+				ticketTeam.setTeamName(list.get(i).toString());
+				Object[] tmp = new Object[] { ticketTeam.getTeamId(), ticketTeam.getTeamName(), ticketTeam.getCreatedDate(),
+						ticketTeam.getModifiedDate() };
+				inputList.add(tmp);
+				id++;
+			}
+			jdbcTemplate.batchUpdate(QUERY, inputList);
 		}
-	}
-
-	public List<TicketTeam> getTicketTeamList() {
+public List<TicketTeam> getTicketTeamList() {
 		List<TicketTeam> ticketTeamList = new ArrayList<TicketTeam>();
 		TicketTeam ticketTeam;
 		try {
@@ -191,13 +185,24 @@ public class TicketingImpl implements TicketingDaoService {
 	// TicketResourceType Query
 
 	public void createTicketResType(TicketResourceType ticketResourceType) {
-		int id = getMaxId("RES_TYPE_ID", "CBP_TKT_RES_TYPE") + 1;
-		ticketResourceType.setResTypeId(id);
+		int id;
 		String QUERY = "INSERT into CBP_TKT_RES_TYPE(RES_TYPE_ID,RES_TYPE_NAME,CBP_CREATED_TIMESTAMP,CBP_UPDATED_TIMESTAMP) values(? , ? , ? , ?)";
-		Object[] a = new Object[] { ticketResourceType.getResTypeId(), ticketResourceType.getResTypeName(),
-				ticketResourceType.getCreatedDate(), ticketResourceType.getModifiedDate() };
-		jdbcTemplate.update(QUERY, a);
+		id = getMaxId("RES_TYPE_ID", "CBP_TKT_RES_TYPE") + 1;
+		List<Object[]> inputList = new ArrayList<Object[]>();
+		List list = ticketResourceType.getResTypeNames();
+		for (int i = 0; i < list.size(); i++) {
+			ticketResourceType.setResTypeId(id);
+			logger.info("Application name" + list.get(i).toString());
+			ticketResourceType.setResTypeName(list.get(i).toString());
+			Object[] tmp = new Object[] { ticketResourceType.getResTypeId(), ticketResourceType.getResTypeName(),
+					ticketResourceType.getCreatedDate(), ticketResourceType.getModifiedDate() };
+			inputList.add(tmp);
+			id++;
+		}
+		jdbcTemplate.batchUpdate(QUERY, inputList);
 	}
+		
+		
 
 	public List<TicketResourceType> getTicketResorceTypeList() {
 		List<TicketResourceType> ticketResTypeList = new ArrayList<TicketResourceType>();
@@ -232,13 +237,31 @@ public class TicketingImpl implements TicketingDaoService {
 	// TicketResource
 
 	public void createTicketRes(TicketResource ticketResource) {
-		int id = getMaxId("RES_TYPE_ID", "CBP_TKT_RES_TYPE") + 1;
-		ticketResource.setResTypeId(id);
+		int id;
 		String QUERY = "INSERT into CBP_TKT_RES(RES_ID,RES_NAME,RES_TYPE_ID,CBP_CREATED_TIMESTAMP,CBP_UPDATED_TIMESTAMP) values(? , ? , ? , ? , ?)";
-		Object[] a = new Object[] { ticketResource.getResId(), ticketResource.getResName(),
-				ticketResource.getResTypeId(), ticketResource.getCreatedDate(), ticketResource.getModifiedDate() };
-		jdbcTemplate.update(QUERY, a);
-
+		id = getMaxId("RES_ID", "CBP_TKT_RES") + 1;
+		List<Object[]> inputList = new ArrayList<Object[]>();
+		List list = ticketResource.getResNames();
+		List<Integer> ids=ticketResource.getResTypeIds();
+		System.out.println(id);
+		for (int i = 0; i < list.size(); i++) {
+			
+			
+				ticketResource.setResId(id);
+				ticketResource.setResName(list.get(i).toString());
+				ticketResource.setResTypeId(ids.get(i));
+			/*logger.info("Application name" + list.get(i).toString());
+			logger.info("Application name" + list.get(j));
+			*/
+			Object[] tmp = new Object[] { ticketResource.getResId(), ticketResource.getResName(),
+					ticketResource.getResTypeId(), ticketResource.getCreatedDate(), ticketResource.getModifiedDate() };
+			inputList.add(tmp);
+			id++;
+		
+			
+		}
+		
+		jdbcTemplate.batchUpdate(QUERY, inputList);
 	}
 
 	public List<TicketResource> getTicketResourceList() {
@@ -277,13 +300,25 @@ public class TicketingImpl implements TicketingDaoService {
 
 	public void createTicketEnvType(TicketEnvType ticketEnvType) {
 		int id = getMaxId("ENV_TYPE_ID", "CBP_TKT_ENV_TYPE") + 1;
-		ticketEnvType.setEnvTypeId(id);
+		
 		String QUERY = "INSERT into CBP_TKT_ENV_TYPE(ENV_TYPE_ID,ENV_TYPE_NAME,CBP_CREATED_TIMESTAMP,CBP_UPDATED_TIMESTAMP) values(? , ? , ? , ?)";
-		Object[] a = new Object[] { ticketEnvType.getEnvTypeId(), ticketEnvType.getEnvTypeName(),
-				ticketEnvType.getCreatedDate(), ticketEnvType.getModifiedDate() };
-		jdbcTemplate.update(QUERY, a);
+		List<Object[]> inputList = new ArrayList<Object[]>();
+		List list = ticketEnvType.getEnvTypeNames();
+		for (int i = 0; i < list.size(); i++) {
+			ticketEnvType.setEnvTypeId(id);
+			logger.info("Application name" + list.get(i).toString());
+			ticketEnvType.setEnvTypeName(list.get(i).toString());
+			Object[] tmp= new Object[] { ticketEnvType.getEnvTypeId(), ticketEnvType.getEnvTypeName(),
+					ticketEnvType.getCreatedDate(), ticketEnvType.getModifiedDate() };
+			inputList.add(tmp);
+			id++;
+		}
+		
+		jdbcTemplate.batchUpdate(QUERY, inputList);
 	}
-
+		
+		
+	
 	public List<TicketEnvType> getTicketEnvType() {
 		List<TicketEnvType> ticketEnvTypeList = new ArrayList<TicketEnvType>();
 		String QUERY = "SELECT * FROM  CBP_TKT_ENV_TYPE";
