@@ -4,53 +4,49 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.validation.Valid;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.cbp.ticketing.action.implService.TicketingServiceImpl;
 import com.cbp.ticketing.common.ErrorCodes;
+import com.cbp.ticketing.model.OptionType;
 import com.cbp.ticketing.model.ResponseBodyHelper;
 import com.cbp.ticketing.model.TicketApp;
 import com.cbp.ticketing.model.TicketEnvResTeamApp;
 import com.cbp.ticketing.model.TicketEnvType;
 import com.cbp.ticketing.model.TicketResCredentials;
+import com.cbp.ticketing.model.TicketResSubType;
 import com.cbp.ticketing.model.TicketResource;
 import com.cbp.ticketing.model.TicketResourceType;
+import com.cbp.ticketing.model.TicketRole;
 import com.cbp.ticketing.model.TicketTeam;
+import com.cbp.ticketing.model.TicketUser;
 import com.cbp.ticketing.model.UserLogin;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
+@Lazy
 @RestController
-@EnableAutoConfiguration
 @RequestMapping(path = "/ticketing")
 public class TicketingController {
 	private static final Logger logger = LoggerFactory.getLogger(TicketingController.class);
-	@Value("${errors.lookup.unknown}")
-	private String unknown;
-
 	@Autowired
 	TicketingServiceImpl ticket;
 	@Autowired
 	ErrorCodes errorcodes;
 
 	@PostMapping(path = "/login")
-	public ResponseEntity<?> login(@RequestBody UserLogin user) {
+	public ResponseEntity<?> login(@RequestBody TicketUser user) {
 		ResponseBodyHelper responseBody = new ResponseBodyHelper();
-		logger.info("Login User Name" + user.getUserName());
-		List<UserLogin> users = ticket.login(user);
+		logger.info("Login User Name" + user.getUserName() + "password" + user.getPassword());
+		List<TicketUser> users = ticket.login(user);
 		if (users.size() > 0) {
 			responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 			responseBody.setReqStatus("success");
@@ -133,56 +129,51 @@ public class TicketingController {
 	}
 
 //TicketTeam Controllers
-	@PostMapping(path = "/saveTicketTeam")
-	public ResponseEntity<?> saveTicketTeam(@RequestBody TicketTeam ticketTeam) {
-		ResponseBodyHelper responseBody = new ResponseBodyHelper();
-		ticket.createTicketTeam(ticketTeam);
-		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
-		responseBody.setReqStatus("success");
-		responseBody.setMessage(errorcodes.getERRORS_NEWTEAMCREATION_SUCCESS());
-		return ResponseEntity.ok(responseBody);
-	}
-
-	@GetMapping(path = "/getTicketTeamList")
-	public ResponseEntity<?> getTicketTeamList() {
-		ResponseBodyHelper responseBody = new ResponseBodyHelper();
-		List<TicketTeam> ticketAppList = new ArrayList<TicketTeam>();
-		ticketAppList = ticket.getTicketTeamList();
-		if (ticketAppList.size() > 0) {
-			responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
-			responseBody.setReqStatus("success");
-			responseBody.setMessage("TicketTeamList is found");
-			responseBody.setResult(ticketAppList);
-		} else {
-			responseBody.setReqStatus("failed");
-			responseBody.setMessage("TicketTeamList is not found");
-		}
-
-		return ResponseEntity.ok(responseBody);
-
-	}
-
-	@PostMapping(path = "/updateTicketTeam")
-	public ResponseEntity<?> updateTicketTeam(@RequestBody TicketTeam ticketTeam) {
-		ResponseBodyHelper responseBody = new ResponseBodyHelper();
-		System.out.println(ticketTeam.getTeamName());
-		ticket.updateTicketTeam(ticketTeam);
-		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
-		responseBody.setReqStatus("success");
-		responseBody.setMessage(errorcodes.getERRORS_NEWTEAMUPDATED_SUCCESS());
-		return ResponseEntity.ok(responseBody);
-	}
-
-	@PostMapping(path = "/deleteTicketTeam")
-	public ResponseEntity<?> deleteTicketTeam(@RequestBody TicketTeam ticketTeam) {
-		ResponseBodyHelper responseBody = new ResponseBodyHelper();
-		ticket.deleteTicketTeam(ticketTeam);
-		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
-		responseBody.setReqStatus("success");
-		responseBody.setMessage(errorcodes.getERRORS_DELETEAPPLICATION_SUCCES());
-		return ResponseEntity.ok(responseBody);
-
-	}
+	/*
+	 * @PostMapping(path = "/saveTicketTeam") public ResponseEntity<?>
+	 * saveTicketTeam(@RequestBody TicketTeam ticketTeam) { ResponseBodyHelper
+	 * responseBody = new ResponseBodyHelper(); ticket.createTicketTeam(ticketTeam);
+	 * responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
+	 * responseBody.setReqStatus("success");
+	 * responseBody.setMessage(errorcodes.getERRORS_NEWTEAMCREATION_SUCCESS());
+	 * return ResponseEntity.ok(responseBody); }
+	 * 
+	 * @GetMapping(path = "/getTicketTeamList") public ResponseEntity<?>
+	 * getTicketTeamList() { ResponseBodyHelper responseBody = new
+	 * ResponseBodyHelper(); List<TicketTeam> ticketAppList = new
+	 * ArrayList<TicketTeam>(); ticketAppList = ticket.getTicketTeamList(); if
+	 * (ticketAppList.size() > 0) {
+	 * responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
+	 * responseBody.setReqStatus("success");
+	 * responseBody.setMessage("TicketTeamList is found");
+	 * responseBody.setResult(ticketAppList); } else {
+	 * responseBody.setReqStatus("failed");
+	 * responseBody.setMessage("TicketTeamList is not found"); }
+	 * 
+	 * return ResponseEntity.ok(responseBody);
+	 * 
+	 * }
+	 * 
+	 * @PostMapping(path = "/updateTicketTeam") public ResponseEntity<?>
+	 * updateTicketTeam(@RequestBody TicketTeam ticketTeam) { ResponseBodyHelper
+	 * responseBody = new ResponseBodyHelper();
+	 * System.out.println(ticketTeam.getTeamName());
+	 * ticket.updateTicketTeam(ticketTeam);
+	 * responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
+	 * responseBody.setReqStatus("success");
+	 * responseBody.setMessage(errorcodes.getERRORS_NEWTEAMUPDATED_SUCCESS());
+	 * return ResponseEntity.ok(responseBody); }
+	 * 
+	 * @PostMapping(path = "/deleteTicketTeam") public ResponseEntity<?>
+	 * deleteTicketTeam(@RequestBody TicketTeam ticketTeam) { ResponseBodyHelper
+	 * responseBody = new ResponseBodyHelper(); ticket.deleteTicketTeam(ticketTeam);
+	 * responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
+	 * responseBody.setReqStatus("success");
+	 * responseBody.setMessage(errorcodes.getERRORS_DELETEAPPLICATION_SUCCES());
+	 * return ResponseEntity.ok(responseBody);
+	 * 
+	 * }
+	 */
 
 	// TicketRes Controllers
 	@PostMapping(path = "/saveTicketRes")
@@ -324,7 +315,7 @@ public class TicketingController {
 	@PostMapping(path = "/updateTicketResourceType")
 	public ResponseEntity<?> updateTicketResourceType(@RequestBody TicketResourceType ticketResType) {
 		ResponseBodyHelper responseBody = new ResponseBodyHelper();
-		System.out.println(ticketResType.getResTypeName());
+		// System.out.println(ticketResType.getResTypeName());
 		ticket.updateTicketResourceType(ticketResType);
 		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 		responseBody.setReqStatus("success");
@@ -425,6 +416,141 @@ public class TicketingController {
 
 		return ResponseEntity.ok(responseBody);
 
+	}
+
+	// TickectResourceSubType
+	/*
+	 * @PostMapping(path = "/saveTicketResSubType") public ResponseEntity<?>
+	 * saveTicketResSubType(@RequestBody TicketResSubType ticketResSubType) {
+	 * ResponseBodyHelper responseBody = new ResponseBodyHelper();
+	 * logger.info("List of TicketResSubTypeName.." + ticketResSubType);
+	 * ticket.createTicketResSubType(ticketResSubType);
+	 * responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
+	 * responseBody.setReqStatus("success");
+	 * responseBody.setMessage(errorcodes.getERRORS_NEWAPPLICATIONCREATION_SUCCESS()
+	 * ); return ResponseEntity.ok(responseBody); }
+	 * 
+	 * @GetMapping(path = "/getTicketResSubTypeList") public ResponseEntity<?>
+	 * getTicketResSubTypeList(){ ResponseBodyHelper responseBody = new
+	 * ResponseBodyHelper(); List<TicketResSubType> ticketResSubTypeList = new
+	 * ArrayList<TicketResSubType>(); ticketResSubTypeList =
+	 * ticket.getTicketResSubTypeList(); if (ticketResSubTypeList.size() > 0) {
+	 * responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
+	 * responseBody.setReqStatus("success");
+	 * responseBody.setMessage("TicketResourceTypeList is found");
+	 * responseBody.setResult(ticketResSubTypeList); } else {
+	 * responseBody.setReqStatus("failed");
+	 * responseBody.setMessage("TicketResourceTypeList is not found"); }
+	 * 
+	 * return ResponseEntity.ok(responseBody);
+	 * 
+	 * }
+	 */
+	@PostMapping(path = "/saveUser")
+	public ResponseEntity<?> createTicketUser(@RequestBody TicketUser ticketUser) {
+		ResponseBodyHelper responseBody = new ResponseBodyHelper();
+		logger.info("List of TicketResSubTypeName.." + ticketUser);
+		System.out.println(ticketUser.getUserName());
+		ticket.createTicketUser(ticketUser);
+		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
+		responseBody.setReqStatus("success");
+		responseBody.setMessage("user created successfully");
+
+		return ResponseEntity.ok(responseBody);
+
+	}
+
+	@GetMapping(path = "/getUserList")
+	public ResponseEntity<?> getTicketUserList() {
+		ResponseBodyHelper responseBody = new ResponseBodyHelper();
+		List<TicketUser> userList = new ArrayList<TicketUser>();
+		userList = ticket.getTicketUserList();
+		logger.info("displaying ticketApplication List ...." + userList);
+		if (userList.size() > 0) {
+			responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
+			responseBody.setReqStatus("success");
+			responseBody.setMessage("TicketAppList is found");
+			responseBody.setResult(userList);
+		} else {
+			responseBody.setReqStatus("failed");
+			responseBody.setMessage("TicketAppList is not found");
+		}
+
+		return ResponseEntity.ok(responseBody);
+
+	}
+
+	@GetMapping(path = "/getListOfOptionTypes")
+	public ResponseEntity<?> getListOfOptionTypes() {
+		ResponseBodyHelper responseBody = new ResponseBodyHelper();
+		List<OptionType> OptionTypeList = new ArrayList<OptionType>();
+		OptionTypeList = ticket.getListOfOptionTypes();
+		logger.info("displaying ticketApplication List ...." + OptionTypeList);
+		if (OptionTypeList.size() > 0) {
+			responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
+			responseBody.setReqStatus("success");
+			responseBody.setMessage("TicketAppList is found");
+			responseBody.setResult(OptionTypeList);
+		} else {
+			responseBody.setReqStatus("failed");
+			responseBody.setMessage("TicketAppList is not found");
+		}
+
+		return ResponseEntity.ok(responseBody);
+
+	}
+
+	@PostMapping(path = "/saveRole")
+	public ResponseEntity<?> createTicketRole(@RequestBody TicketRole ticketRole) {
+
+		ResponseBodyHelper responseBody = new ResponseBodyHelper();
+		ticket.createTicketRole(ticketRole);
+		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
+		responseBody.setReqStatus("success");
+		responseBody.setMessage("role is  created successfully");
+		return ResponseEntity.ok(responseBody);
+
+	}
+
+	@PostMapping(path = "/getSeletedOptionTypes")
+	public ResponseEntity<?> getSeletedOptionTypes(@RequestBody TicketRole ticketRole) {
+		ResponseBodyHelper responseBody = new ResponseBodyHelper();
+		List<OptionType> list = ticket.getSeletedOptionTypes(ticketRole);
+		// List unassignList=ticketRole.getDeletedTypeIds();
+		List<Integer> InsertOpsIds = ticketRole.getOptionTypeIds();
+		List<Integer> deletedOpsIds = new ArrayList();
+		List<Integer> updatelist = new ArrayList();
+		int id1 = 0;
+		int id2 = 0;
+
+		List remove = new ArrayList<>();
+		for (int i = 0; i < list.size(); i++) {
+			int id = list.get(i).getOpTypeId();
+			deletedOpsIds.add(id);
+		}
+		for (int i = 0; i < deletedOpsIds.size(); i++) {
+			id2 = deletedOpsIds.get(i);
+			for (int j = 0; j < InsertOpsIds.size(); j++) {
+				id1 = InsertOpsIds.get(j);
+				if (id2 == id1) {
+					remove.add(id2);
+				}
+			}
+		}
+
+		deletedOpsIds.removeAll(remove);
+		InsertOpsIds.removeAll(remove);
+		ticketRole.setDeletedTypeIds(deletedOpsIds);
+		ticketRole.setOptionTypeIds(InsertOpsIds);
+		// System.out.println("insertlist......"+insertlist);
+		// System.out.println("assignList......"+assignList);
+		ticket.UpdateRoleTypes(ticketRole);
+
+		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
+		responseBody.setReqStatus("success");
+		responseBody.setMessage("updated");
+		responseBody.setResult(list);
+		return ResponseEntity.ok(responseBody);
 	}
 
 }

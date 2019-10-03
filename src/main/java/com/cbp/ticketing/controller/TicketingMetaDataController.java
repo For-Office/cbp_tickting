@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cbp.ticketing.action.implService.TicketingMetaDataServiceImpl;
+import com.cbp.ticketing.model.ServicenowData;
 import com.cbp.ticketing.model.TableMetadata;
 
 @RestController
@@ -32,7 +33,7 @@ public class TicketingMetaDataController {
 //	        return ticketingService.getDevDatabaseTablesMetadata();
 //	    }
 	    
-	    @PostMapping(value="/getDevDatabaseTablesMetadata",produces=MediaType.APPLICATION_JSON_VALUE)
+	   @PostMapping(value="/getDevDatabaseTablesMetadata",produces=MediaType.APPLICATION_JSON_VALUE)
 	    public List<TableMetadata> getDevDatabaseTablesMetadata1(@RequestBody TableMetadata metadata) throws SQLException {
 	        return ticketingService.getDevDatabaseTablesMetadata(metadata);
 	    }
@@ -46,10 +47,12 @@ public class TicketingMetaDataController {
 	    public List<TableMetadata> getDevListOfMatchedMetadata(@RequestBody(required = false) String sqlquery) throws SQLException {
 	        return ticketingService.getDevListOfMatchedMetadata(sqlquery);
 	    }
-	   /* @PostMapping("/validate/{env}")
+	    @PostMapping("/validate/{env}")
 	    public ServicenowData validate(@RequestBody(required = false) String sqlquery,@PathVariable(value = "env") String env) throws SQLException, IOException, JSONException {
-	         return rulesRepository.validate(sqlquery,null,env);
-	    }*/
+	    	System.out.println("env type....."+env);
+	    	System.out.println("sqlquery ........."+sqlquery);
+	         return ticketingService.validate(sqlquery,null,env);
+	    }
 	    @GetMapping("/usertest/{schema}/{statement}")
 	    public boolean userpermission(@PathVariable(value = "schema") String schema, @PathVariable(value = "statement") String statement) throws SQLException, IOException, JSONException {
 	         return ticketingService.userPermission(schema,statement);

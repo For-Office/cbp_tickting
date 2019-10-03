@@ -9,6 +9,8 @@ public class TicketApp {
 	private  List appNames;
 	private Date createdDate;
 	private Date modifiedDate;
+	private Date deleted_ts;
+	private String is_deleted;
 	public int getAppId() {
 		return appId;
 	}
@@ -46,6 +48,28 @@ public class TicketApp {
 	 */
 	public void setAppNames(List appNames) {
 		this.appNames = appNames;
+	}
+	
+	public String getIs_deleted() {
+		return is_deleted;
+	}
+	/**
+	 * @param is_deleted the is_deleted to set
+	 */
+	public void setIs_deleted(String is_deleted) {
+		this.is_deleted = is_deleted;
+	}
+	/**
+	 * @return the deleted_ts
+	 */
+	public Date getDeleted_ts() {
+		return deleted_ts;
+	}
+	/**
+	 * @param deleted_ts the deleted_ts to set
+	 */
+	public void setDeleted_ts(Date deleted_ts) {
+		this.deleted_ts = deleted_ts;
 	}
 	
 	

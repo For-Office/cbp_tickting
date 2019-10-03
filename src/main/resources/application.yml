@@ -38,7 +38,15 @@ db2:
     MY_DB_URL: jdbc:mysql://localhost:3306/mahesh
     MY_DB_USER: root
     MY_DB_PASSWORD: root
-   
+    
+servicenow:
+  updateurl : https://dev53134.service-now.com/api/now/table/incident/
+  geturl : https://dev53134.service-now.com/api/now/table/incident?number=
+  createurl : https://dev53134.service-now.com/api/now/table/incident
+  downloadattachement : https://dev53134.service-now.com/api/now/attachment?table_sys_id=
+  accept : application/json
+  contenttype : application/json
+  authorization : Basic YWRtaW46SmV2aWthQDEyMw==
 csvList:
   customDateFormatsSupported: dd/MM/yyyy HH:mm:ss.SSSSSSS
 #errors:

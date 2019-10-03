@@ -1,5 +1,11 @@
 package com.cbp.ticketing.dao.daoImpl;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -13,26 +19,23 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
-import javax.sql.DataSource;
 
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
+import com.cbp.ticketing.action.implService.ServiceNowImplSevice;
 import com.cbp.ticketing.action.implService.WhereConditionTraverser;
 import com.cbp.ticketing.controller.TicketingController;
 import com.cbp.ticketing.dao.daoService.TicketingMetaDataService;
 import com.cbp.ticketing.model.DeleteMetadata;
+import com.cbp.ticketing.model.DownloadAttachement;
 import com.cbp.ticketing.model.SelectMetadata;
+import com.cbp.ticketing.model.ServicenowData;
 import com.cbp.ticketing.model.TableMetadata;
 import com.cbp.ticketing.model.TableStructure;
 
@@ -49,9 +52,12 @@ import gudusoft.gsqlparser.stmt.TInsertSqlStatement;
 import gudusoft.gsqlparser.stmt.TSelectSqlStatement;
 
 @Repository
+@Component
 public class TicketingMetaDataImpl implements TicketingMetaDataService{
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
+	@Autowired
+	ServiceNowImplSevice serviceNowImplSevice;
 	@Autowired
 	RulesDBConnection rulesDBConnection;
 	Connection connection = null;
@@ -64,7 +70,7 @@ public class TicketingMetaDataImpl implements TicketingMetaDataService{
 	@PostConstruct
 	public void initialize() {
 		try {
-			connection = rulesDBConnection.getDevDatabaseConection("db1");
+			connection = rulesDBConnection.getDevDatabaseConection("spring");
 
 		} catch (SQLException e) {
 			System.err.println("There was an error getting the connection: " + e.getMessage());
@@ -73,12 +79,12 @@ public class TicketingMetaDataImpl implements TicketingMetaDataService{
 	}
 	private static final Logger logger = LoggerFactory.getLogger(TicketingController.class);
 	
-	/*public DatabaseMetaData getDevDatabaseMetaData() throws SQLException {
+	public DatabaseMetaData getDevDatabaseMetaData() throws SQLException {
 		 metadata = jdbcTemplate.getDataSource().getConnection().getMetaData();
-		 System.out.println("metadata"+metadata);
+		 System.out.println("jdbcTemplate......."+metadata);
 	return metadata;
 }
-	*/
+	
 	/*public List<TableMetadata> getColumnsMetadata(ArrayList<String> tables, String schema, String db,DatabaseMetaData metadata1 )
 			throws SQLException {
 		List<TableMetadata> tableMetadataList = new ArrayList<TableMetadata>();
@@ -136,16 +142,16 @@ public class TicketingMetaDataImpl implements TicketingMetaDataService{
 
 			List<TableMetadata> tables = new ArrayList<TableMetadata>();
 			TGSqlParser sqlparser = new TGSqlParser(EDbVendor.dbvpostgresql);
-			System.out.println("testting");
+			System.out.println("testting getListOfUsedTableMetadata");
 			// sqlparser.sqltext = "select a.id, a.state,a.ve_serial_no,b.state1 from
 			// public.veinfo a left join velog.veinfo b on a.id=b.id";
 			sqlparser.sqltext = sqlquery;
 			int ret = sqlparser.parse();
 			if (ret != 0) {
 				System.err.println(sqlparser.getErrormessage());
-				System.out.println("testting111111111");
+				//System.out.println("testting111111111");
 			} else {
-				System.out.println("testttttttttttt" + sqlparser.sqlstatements.size());
+				System.out.println("sqlparser.sqlstatements.size()....naga........." + sqlparser.sqlstatements.size());
 				for (int k = 0; k < sqlparser.sqlstatements.size(); k++) {
 					if (sqlparser.sqlstatements.get(k) instanceof TCustomSqlStatement) {
 						tables = analyzeStatement((TCustomSqlStatement) sqlparser.sqlstatements.get(k),
@@ -153,6 +159,7 @@ public class TicketingMetaDataImpl implements TicketingMetaDataService{
 					}
 				}
 			}
+			System.out.println("tables.......aaaa......."+tables.toString());
 			return tables;
 		}
 
@@ -163,18 +170,22 @@ public class TicketingMetaDataImpl implements TicketingMetaDataService{
 			if (stmt instanceof TSelectSqlStatement) {
 				Set<String> columnslist = selectMetadata.getListOfResultColumns((TSelectSqlStatement) stmt);
 				Set<String> tables = selectMetadata.analyzeSelectStatement((TSelectSqlStatement) stmt);
+				System.out.println("selectMetadata.analyzeSelectStatement((TSelectSqlStatement) stmt);"+tables);
 				if (!tables.isEmpty()) {
 
 					String[] tableArray = tables.toArray(new String[0]);
+					System.out.println("tableArray....."+tableArray);
 					for (int i = 0; i < tableArray.length; i++) {
 						TableMetadata a = new TableMetadata();
 						a.setDatabase(db);
 						a.setTableName(tableArray[i].toUpperCase());
+						System.out.println("tableArray....."+tableArray[i]);
 						if (tableArray[i].contains(".")) {
 							String[] tableArray1 = tableArray[i].split("\\.");
 							a.setDatabase(db);
 							a.setSchema(tableArray1[0]);
 							a.setTableName(tableArray1[1].toUpperCase());
+							System.out.println("tableArray1[1].toUpperCase().."+tableArray1[1].toUpperCase());
 							a.setStatement("select");
 
 						}
@@ -380,7 +391,8 @@ public class TicketingMetaDataImpl implements TicketingMetaDataService{
 						for (TableStructure a : getListOfUsedTableMetadata1.getTableStructure()) {
 							for (TableStructure b : getSchemaOneTablesMetadata1.getTableStructure()) {
 
-								System.out.println("table columns::::" + b.getColumn_name());
+								System.out.println("getColumn_name()::::" + b.getColumn_name());
+								System.out.println("12getColumn_name()::::" + a.getColumn_name());
 								if (a.getColumn_name().equalsIgnoreCase(b.getColumn_name())) {
 									TableStructure tableStructure = new TableStructure();
 
@@ -424,7 +436,7 @@ public class TicketingMetaDataImpl implements TicketingMetaDataService{
 			}
 			return getColumnsMetadata(tables, null, metadata.getDatabaseProductName(),metadata);
 		}
-	 public DatabaseMetaData getDevDatabaseMetaData() throws SQLException {
+	 /*public DatabaseMetaData getDevDatabaseMetaData() throws SQLException {
 
 			try {
 				metadata = connection.getMetaData();
@@ -435,7 +447,7 @@ public class TicketingMetaDataImpl implements TicketingMetaDataService{
 
 			return metadata;
 
-		}
+		}*/
 	 public List<TableMetadata> getColumnsMetadata(ArrayList<String> tables, String schema, String db,DatabaseMetaData metadata1 )
 				throws SQLException {
 			List<TableMetadata> tableMetadataList = new ArrayList<TableMetadata>();
@@ -446,16 +458,17 @@ public class TicketingMetaDataImpl implements TicketingMetaDataService{
 				TableMetadata tableMetadata = new TableMetadata();
 				tableMetadata.setDatabase(db);
 				tableMetadata.setSchema(actualTable1[0]);
+				
 				tableMetadata.setTableName(actualTable1[1].toUpperCase());
 				System.out.println("test" + actualTable1[0]);
 				System.out.println("test1" + actualTable1[1]);
 				List<TableStructure> tableStructureList = new ArrayList<TableStructure>();
-				rs = metadata1.getColumns(null, actualTable1[0], actualTable1[1], null);
+				rs = metadata1.getColumns(null, actualTable1[0].toUpperCase(), actualTable1[1].toUpperCase(), null);
 
-				System.out.println(actualTable.toUpperCase());
+				
 
 				while (rs.next()) {
-
+					System.out.println("TABLE STRUCT:"+actualTable.toUpperCase());
 					TableStructure a = new TableStructure();
 					a.setColumn_name(rs.getString("COLUMN_NAME"));
 					a.setDatatype(rs.getString("TYPE_NAME"));
@@ -478,7 +491,7 @@ public class TicketingMetaDataImpl implements TicketingMetaDataService{
 			try {
 				
 				Statement stmt = connection.createStatement();
-				ResultSet rs = stmt.executeQuery("SELECT * FROM public.user_permission");
+				ResultSet rs = stmt.executeQuery("SELECT * FROM TICKETING.CBP_TKT_SCHEMA_MAPPING");
 				
 				
 				while (rs.next()) {
@@ -504,4 +517,251 @@ public class TicketingMetaDataImpl implements TicketingMetaDataService{
 		}
 			return flag;
 		}
+	 public ServicenowData validate(String sqlquery, String jsonInput, String dbselection) throws IOException, JSONException {
+			StringBuffer alterScript = new StringBuffer();
+			
+			List<TableMetadata> getqametadata = null;
+			List<TableMetadata> tables = new ArrayList<TableMetadata>();
+			String devserver=null;
+			String devdbname=null;
+			String devSchema=null;
+			String uatserver=null;
+			String uatdbname=null;
+			String uatSchema=null;
+			String prodserver=null;
+			String proddbname=null;
+			String prodSchema=null;
+			boolean execute_script=false;
+			try {
+				List<TableMetadata> getdevmetadata = getDevListOfMatchedMetadata(sqlquery);
+				Statement stmt = connection.createStatement();
+				ResultSet rs = stmt.executeQuery("SELECT * FROM TICKETING.CBP_TKT_SCHEMA_MAPPING");
+				ArrayList<String> list = new ArrayList<String>();
+				
+				while (rs.next()) {
+					for (TableMetadata b : getdevmetadata) {
+						String [] devdbarr=rs.getString(2).split("@");
+						System.out.println("testing"+rs.getString(2));
+						 devserver=devdbarr[0];
+						 devdbname=devdbarr[1];
+						 devSchema=devdbarr[2];
+						 System.out.println("devSchema....."+devSchema);
+						 String [] uatdbarr=rs.getString(3).split("@");
+						 uatserver=uatdbarr[0];
+						 uatdbname=uatdbarr[1];
+						 uatSchema=uatdbarr[2];
+						 String [] proddbarr=rs.getString(4).split("@");
+						 prodserver=proddbarr[0];
+						 System.out.println("prodserver...."+prodserver);
+						 proddbname=proddbarr[1];
+						 prodSchema=proddbarr[2];
+						 System.out.println("a.devSchema....."+devSchema);
+						 System.out.println("b.devSchema....."+b.getSchema());
+						if (b.getSchema().equalsIgnoreCase(devSchema)) {
+							System.out.println("testing in loop:::::"+b.getStatement());
+							
+							/*
+							 * System.out.println("b.getSchema()"+b.getSchema());
+							 * System.out.println("b.getTableName()"+b.getTableName());
+							 */
+						if (dbselection.equals("UAT"))
+						{
+							execute_script=userPermission(uatSchema, b.getStatement());
+							System.out.println("UAT::::::::::::");
+							String schema = uatSchema;
+							String tablename = b.getTableName().toLowerCase();
+							list.add(schema + "@" + tablename);
+							//qaconnection = rulesDBConnection.getDevDatabaseConection(uatserver);
+							connection = rulesDBConnection.getDevDatabaseConection("db1");
+							qametadata=connection.getMetaData();
+							getqametadata = getColumnsMetadata(list, null, qametadata.getDatabaseProductName(),qametadata);
+							 System.out.println("getqametadata..........PROD................."+getqametadata);
+						}
+						else if (dbselection.equals("DEV"))
+						{
+							execute_script=userPermission(prodSchema, b.getStatement());
+							System.out.println("dev:::::::::::::@@@@@@@@@");
+							String schema = prodSchema;
+							String tablename = b.getTableName().toLowerCase();
+							list.add(schema + "@" + tablename);
+							/*
+							 * System.out.println("1:"+rs.getString(2));
+							 * System.out.println("2:"+rs.getString(3));
+							 */
+							mysqlconnection = rulesDBConnection.getDevDatabaseConection("spring");
+							mysqlmetadata=mysqlconnection.getMetaData();
+							getqametadata = getColumnsMetadata(list, null, mysqlmetadata.getDatabaseProductName(),mysqlmetadata);
+							 System.out.println("getqametadata...........DEV................"+getqametadata);
+						}
+						}
+					}
+				}
+				
+				
+				// System.out.println("list"+list);
+
+				for (TableMetadata getListOfUsedTableMetadata1 : getdevmetadata) {
+					
+					 System.out.println("getListOfUsedTableMetadata1.getTableName()::::::::::::"+getListOfUsedTableMetadata1.getSchema());
+				 
+					for (TableMetadata getqametadata1 : getqametadata) {
+						System.out.println("getqametadata1.getTableName() table ........@@@@@@@"+getqametadata1.getTableStructure());
+						// if
+						// (getqametadata1.getSchema().equals(getListOfUsedTableMetadata1.getSchema())
+						// &&
+					 System.out.println("getqametadata1.getTableName() table ........:::::::1::::"+getqametadata1.getTableName()+":::2  :::::::"+(getListOfUsedTableMetadata1.getTableName()));
+						if (getqametadata1.getTableName().equals(getListOfUsedTableMetadata1.getTableName())) {
+							TableMetadata tableMetadata = new TableMetadata();
+							 System.out.println("2 ::::::::naga ......"+getqametadata1.getSchema()+":"+getqametadata1.getDatabase()+":::"+getqametadata1.getTableName());
+							tableMetadata.setSchema(getqametadata1.getSchema());
+							tableMetadata.setDatabase(getqametadata1.getDatabase());
+							tableMetadata.setTableName(getqametadata1.getTableName());
+							List<TableStructure> tableStructureList = new ArrayList<TableStructure>();
+							System.out.println("getListOfUsedTableMetadata1 TableStructure "+getListOfUsedTableMetadata1.getTableStructure());
+							
+							for (TableStructure a : getListOfUsedTableMetadata1.getTableStructure()) {
+								 System.out.println("schema 1 a TableStructure "+a.getColumn_name());
+								boolean flag = true;
+								System.out.println("getTableStructure() "+getqametadata1.getTableStructure());
+								for (TableStructure b : getqametadata1.getTableStructure()) {
+									System.out.println("schema 2 b TableStructure "+a.getColumn_name());
+									if (a.getColumn_name().equals(b.getColumn_name())) {
+										flag = false;
+									}
+								}
+								if (flag) {
+									TableStructure tableStructure = new TableStructure();
+									System.out.println("table columnsalter::::" + a.getColumn_name());
+									tableStructure.setColumn_name(a.getColumn_name());
+									tableStructure.setDatatype(a.getDatatype());
+									tableStructure.setSize(a.getSize());
+									tableStructure.setPrecision(a.getPrecision());
+									tableStructureList.add(tableStructure);
+									System.out.println("a.getSize()"+a.getSize());
+									
+									alterScript.append("ALTER TABLE " + getqametadata1.getSchema() + "."
+											+ getqametadata1.getTableName() + " ADD " + a.getColumn_name() + " "
+											+ a.getDatatype() +"("+a.getSize()+");");
+									alterScript.append(System.lineSeparator());
+									System.out.println("alterScript"+alterScript.toString());
+									
+								}
+								
+							}
+							tableMetadata.setTableStructure(tableStructureList);
+							// tableMetadata.setDbcolumns(existing);
+							tables.add(tableMetadata);
+						}
+
+					}
+
+				}
+
+			} catch (SQLException e) {
+				System.err.println("There was an error getting the connection: " + e.getMessage());
+			}
+			
+			String fileContent = alterScript.toString();
+	String dbservername="";
+			if (dbselection.equalsIgnoreCase("DEV"))
+			{
+				dbservername=prodserver;
+				System.out.println("DEV..."+dbservername);
+			}
+			else if (dbselection.equalsIgnoreCase("UAT"))
+			{
+				
+				dbservername=uatserver;
+				System.out.println("UAT..."+dbservername);
+			}
+			BufferedWriter writer = new BufferedWriter(
+					new FileWriter("C:/Users/rames/Desktop/Angular/"+dbservername+".txt"));
+			writer.write(fileContent);
+			writer.close();
+			String result;
+			/*if (!execute_script)
+			{
+				System.out.println("create incident");
+			//ServicenowData servicenowData=rulesProjectService.ServicenowCreate(null);
+			//return servicenowData;
+			}
+			else
+			{
+				System.out.println("run the script");
+				String filePath="C:\\Users\\gantim1\\Desktop\\Bhaskar\\sql\\"+dbservername+".txt";
+				result= executeSqlScript(null, filePath, dbservername);
+			
+			}*/
+			return null;
+
+		}
+	 public String executeSqlScript(String incidentNumber, String fullPath, String fileName) throws IOException, JSONException {
+			
+		    String fileNameWithOutExt =null;
+		    BufferedReader br;
+		    Statement currentStatement = null;
+		    File inputFile =null;
+		    try {
+		    	if (incidentNumber!=null) {
+		    		
+		    	List<DownloadAttachement> a=serviceNowImplSevice.DownloadfileServicenow(incidentNumber);
+		    	 inputFile = new File("C:\\Users\\gantim1\\Desktop\\Bhaskar\\sql\\"+a.get(0).getFile_name());
+		    	 fileNameWithOutExt = (a.get(0).getFile_name()).replaceFirst("[.][^.]+$", "");
+		    	}
+		    	else
+		    	{
+		    		inputFile = new File(fullPath);
+			    	 fileNameWithOutExt = (fileName);
+		    	}
+		    	System.out.println("filename"+fileNameWithOutExt);
+		    	br = new BufferedReader(new FileReader(inputFile));
+		        //scanner = new Scanner(inputFile).useDelimiter(delimiter);
+		        qaconnection = rulesDBConnection.getDevDatabaseConection(fileNameWithOutExt);
+		        currentStatement = qaconnection.createStatement();
+		    } catch (FileNotFoundException e1) {
+		        e1.printStackTrace();
+		        return e1.getMessage();
+		    }
+		    catch (Exception e1) {
+		        e1.printStackTrace();
+		        return "No file found for execute";
+		    }
+		    
+		    // Loop through the SQL file statements 
+		     
+		    
+		    String st; 
+		    while ((st = br.readLine()) != null)
+		    {
+		      System.out.println(st); 
+		    	        try {
+		        	  // Execute statement	        	
+		            currentStatement.execute(st);
+		        } catch (Exception e) {
+		            e.printStackTrace();
+		            return e.getMessage();
+		        } finally {
+		            // Release resources
+		            if (currentStatement != null) {
+		                try {
+		                    currentStatement.close();
+		                } catch (SQLException e) {
+		                    e.printStackTrace();
+		                }
+		            }
+		            currentStatement = null;
+		        }
+		    }
+		
+		return "Script Executed successfully";
+		}
+		/*
+		 * @Autowired private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+		 */
+		String[] foundTables = new String[10000];
+		String[] foundColumns = new String[10000];
+		int foundTableCount = 0;
+		int foundColumnsCount = 0;
+		
+
 }

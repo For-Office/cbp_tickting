@@ -2,17 +2,23 @@ package com.cbp.ticketing.action.service;
 
 import java.sql.SQLException;
 import java.util.List;
+
+import com.cbp.ticketing.model.OptionType;
 import com.cbp.ticketing.model.TicketApp;
 import com.cbp.ticketing.model.TicketEnvResTeamApp;
 import com.cbp.ticketing.model.TicketEnvType;
 import com.cbp.ticketing.model.TicketResCredentials;
+import com.cbp.ticketing.model.TicketResSubType;
 import com.cbp.ticketing.model.TicketResource;
 import com.cbp.ticketing.model.TicketResourceType;
+import com.cbp.ticketing.model.TicketRole;
 import com.cbp.ticketing.model.TicketTeam;
+import com.cbp.ticketing.model.TicketUser;
 import com.cbp.ticketing.model.UserLogin;
 
 public interface TicketingService {
-	public List<UserLogin> login(UserLogin user);
+	public List<TicketUser> login(TicketUser user);
+	public List<TicketUser> getTicketUserList();
 
 //TeamApp 
 	public void createTicketApp(TicketApp ticketApp);
@@ -24,13 +30,13 @@ public interface TicketingService {
 	public boolean deleteTicketApp(TicketApp ticketApp) throws SQLException;
 
 //TicketTeam
-	public void createTicketTeam(TicketTeam ticketTeam);
+	/*public void createTicketTeam(TicketTeam ticketTeam);
 
 	public List<TicketTeam> getTicketTeamList();
 
 	public void updateTicketTeam(TicketTeam ticketTeam);
 
-	public void deleteTicketTeam(TicketTeam ticketTeam);
+	public void deleteTicketTeam(TicketTeam ticketTeam);*/
 
 //TicketResource
 	public void createTicketRes(TicketResource ticketResource);
@@ -66,4 +72,10 @@ public interface TicketingService {
 	public List<TicketResource> getResNames(TicketEnvResTeamApp ticketEnvResTeamApp);
 
 	public List<TicketResCredentials> getResCredentials(TicketResource ticketResource);
+	public List<TicketResSubType> getTicketResSubTypeList();
+	public void createTicketUser(TicketUser ticketUser);
+	public List<OptionType> getListOfOptionTypes();
+	public void createTicketRole(TicketRole ticketRole);
+	public List<OptionType> getSeletedOptionTypes(TicketRole ticketRole);
+	public void UpdateRoleTypes(TicketRole ticketRole);
 }

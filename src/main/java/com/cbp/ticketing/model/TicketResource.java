@@ -9,6 +9,7 @@ public class TicketResource {
 	private int resTypeId;
 	private Date createdDate;
 	private Date modifiedDate;
+	private String isDeleted;
 	private List resNames;
 	private List<Integer> resTypeIds;
 	public Date getCreatedDate() {
@@ -64,6 +65,18 @@ public class TicketResource {
 	 */
 	public void setResTypeIds(List<Integer> resTypeIds) {
 		this.resTypeIds = resTypeIds;
+	}
+	/**
+	 * @return the isDeleted
+	 */
+	public String getIsDeleted() {
+		return isDeleted;
+	}
+	/**
+	 * @param isDeleted the isDeleted to set
+	 */
+	public void setIsDeleted(String isDeleted) {
+		this.isDeleted = isDeleted;
 	}
 	
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.cbp.ticketing.model.ServicenowData;
 import com.cbp.ticketing.model.TableMetadata;
 
 
@@ -16,5 +17,5 @@ import com.cbp.ticketing.model.TableMetadata;
 	 public List<TableMetadata> getListOfUsedTableMetadata(String sqlquery) ;
 	 public List<TableMetadata> getDevListOfMatchedMetadata(String sqlquery) throws SQLException ;
 	 public boolean userPermission(String schema, String statement) throws IOException, JSONException;
-    
+	 public ServicenowData validate(String sqlquery, String jsonInput, String dbselection) throws IOException, JSONException;
 }

@@ -8,7 +8,22 @@ public class TicketResourceType {
 	private String resTypeName;
 	private Date createdDate;
 	private Date modifiedDate;
+	private Date deletedDate;
+	private String isDeleted;
+	public Date getDeletedDate() {
+		return deletedDate;
+	}
+	public void setDeletedDate(Date deletedDate) {
+		this.deletedDate = deletedDate;
+	}
+	public String getIsDeleted() {
+		return isDeleted;
+	}
+	public void setIsDeleted(String isDeleted) {
+		this.isDeleted = isDeleted;
+	}
 	private List resTypeNames;
+	
 	public Date getCreatedDate() {
 		return createdDate;
 	}

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cbp.ticketing.dao.daoImpl.TicketingMetaDataImpl;
+import com.cbp.ticketing.model.ServicenowData;
 import com.cbp.ticketing.model.TableMetadata;
 
 
@@ -30,4 +31,9 @@ public class TicketingMetaDataServiceImpl {
 	 public boolean userPermission(String schema, String statement) throws IOException, JSONException {
 	 return ticketingMetaDataImpl.userPermission(schema,statement);
 	 }
+	 public ServicenowData validate(String sqlquery, String jsonInput, String dbselection) throws IOException, JSONException{
+		 return ticketingMetaDataImpl.validate(sqlquery,jsonInput,dbselection);
+	 }
+	 
+	 
 }
