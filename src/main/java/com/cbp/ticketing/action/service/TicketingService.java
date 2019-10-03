@@ -78,4 +78,5 @@ public interface TicketingService {
 	public void createTicketRole(TicketRole ticketRole);
 	public List<OptionType> getSeletedOptionTypes(TicketRole ticketRole);
 	public void UpdateRoleTypes(TicketRole ticketRole);
+	public List<TicketRole> getListRoles() ;
 }

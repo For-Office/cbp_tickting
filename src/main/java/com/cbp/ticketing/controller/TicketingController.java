@@ -2,7 +2,9 @@ package com.cbp.ticketing.controller;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -489,11 +491,11 @@ public class TicketingController {
 		if (OptionTypeList.size() > 0) {
 			responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 			responseBody.setReqStatus("success");
-			responseBody.setMessage("TicketAppList is found");
+			responseBody.setMessage("ListOfOptionTypes is found");
 			responseBody.setResult(OptionTypeList);
 		} else {
 			responseBody.setReqStatus("failed");
-			responseBody.setMessage("TicketAppList is not found");
+			responseBody.setMessage("ListOfOptionTypes is not found");
 		}
 
 		return ResponseEntity.ok(responseBody);
@@ -512,7 +514,7 @@ public class TicketingController {
 
 	}
 
-	@PostMapping(path = "/getSeletedOptionTypes")
+	@PostMapping(path = "/updatedOptionTypes")
 	public ResponseEntity<?> getSeletedOptionTypes(@RequestBody TicketRole ticketRole) {
 		ResponseBodyHelper responseBody = new ResponseBodyHelper();
 		List<OptionType> list = ticket.getSeletedOptionTypes(ticketRole);
@@ -549,8 +551,68 @@ public class TicketingController {
 		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 		responseBody.setReqStatus("success");
 		responseBody.setMessage("updated");
-		responseBody.setResult(list);
+		//responseBody.setResult(list);
 		return ResponseEntity.ok(responseBody);
 	}
+	@GetMapping(path = "/getListRoles")
+	public ResponseEntity<?> getListRoles() {
+		ResponseBodyHelper responseBody = new ResponseBodyHelper();
+		List<TicketRole> rolesList = new ArrayList<TicketRole>();
+		rolesList = ticket.getListRoles();
+		logger.info("displaying ticketApplication List ...." + rolesList);
+		if (rolesList.size() > 0) {
+			responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
+			responseBody.setReqStatus("success");
+			responseBody.setMessage("ListOfOptionTypes is found");
+			responseBody.setResult(rolesList);
+		} else {
+			responseBody.setReqStatus("failed");
+			responseBody.setMessage("ListOfOptionTypes is not found");
+		}
 
+		return ResponseEntity.ok(responseBody);
+
+	}
+	
+	@PostMapping(path = "/showUpdateRole")
+	public ResponseEntity<?> showUpdateRoles(@RequestBody TicketRole ticketRole) {
+		ResponseBodyHelper responseBody = new ResponseBodyHelper();
+		List<String> unAssign = new ArrayList<String>();
+		List<String> assign = new ArrayList<String>();
+		
+		List<OptionType> OptionTypeLists = ticket.getListOfOptionTypes();
+		List<OptionType> list = ticket.getSeletedOptionTypes(ticketRole);
+		
+		for (int i = 0; i < OptionTypeLists.size(); i++) {
+			String id = OptionTypeLists.get(i).getOpTypeName();
+			unAssign.add(id);
+		}
+		for (int i = 0; i < list.size(); i++) {
+			String id = list.get(i).getOpTypeName();
+			assign.add(id);
+		}
+		
+		Set<OptionType> remove = new HashSet<>();
+		
+		
+		for (int i = 0; i < OptionTypeLists.size(); i++) {
+			int unassignId = OptionTypeLists.get(i).getOpTypeId();
+			for (int j = 0; j < list.size(); j++) {
+				int assignId = list.get(j).getOpTypeId();
+				if (unassignId != assignId) {
+					remove.add(OptionTypeLists.get(i));
+				}
+			}
+			
+		}
+		
+		unAssign.removeAll(remove);
+		System.out.println("remove"+unAssign);
+		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
+		responseBody.setReqStatus("success");
+		responseBody.setMessage("ListOfOptionTypes is found");
+		responseBody.setResult(remove);
+	
+	return ResponseEntity.ok(responseBody);
+}
 }

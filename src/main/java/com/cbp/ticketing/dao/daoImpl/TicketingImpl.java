@@ -70,7 +70,7 @@ public class TicketingImpl implements TicketingDaoService {
 	public void createTicketApp(TicketApp ticketApp) {
 		String Query_Check = "SELECT * FROM CBP_TKT_APP WHERE APP_NAME = ?";
 		int id;
-		String QUERY = "INSERT into CBP_TKT_APP(APP_ID,APP_NAME,CREATED_TS,UPDATED_TS,DELETED_TS,IS_DELETED) values(? , ? , ? , ? ,?)";
+		String QUERY = "INSERT into CBP_TKT_APP(APP_ID,APP_NAME,CREATED_TS,UPDATED_TS,DELETED_TS,IS_DELETED) values(? , ? , ? , ? ,? ,?)";
 		id = getMaxId("APP_ID", "cbp_TKT_APP") + 1;
 		List<Object[]> inputList = new ArrayList<Object[]>();
 		List list = ticketApp.getAppNames();
@@ -555,9 +555,15 @@ public class TicketingImpl implements TicketingDaoService {
 	}
 
 	public void createTicketRole(TicketRole ticketRole) {
+		
+		/*String SELECTQUERY= "SELECT ROLE_NAME FROM CBP_TKT_ROLE WHERE ROLE_NAME=ticketRole.getRoleName()";
+		jdbcTemplate.execute(SELECTQUERY);*/
+		
+		
 		int id = getMaxId("ROLE_ID", "CBP_TKT_ROLE") + 1;
-		String QUERY = "INSERT into CBP_TKT_ROLE(ROLE_ID,ROLE_NAME,CREATED_TS,UPDATED_TS,DELETED_TS,IS_DELETED) VALUES(? , ? , ? , ? , ? , ?)";
 		ticketRole.setRoleId(id);
+		String QUERY = "INSERT into CBP_TKT_ROLE(ROLE_ID,ROLE_NAME,CREATED_TS,UPDATED_TS,DELETED_TS,IS_DELETED) VALUES(? , ? , ? , ? , ? , ?)";
+		
 		Object[] tmp = new Object[] { ticketRole.getRoleId(), ticketRole.getRoleName(), ticketRole.getCreatedDate(),
 				ticketRole.getModifiedDate(), ticketRole.getDeletedDate(), ticketRole.getIsDeleted() };
 		jdbcTemplate.update(QUERY, tmp);
@@ -565,13 +571,13 @@ public class TicketingImpl implements TicketingDaoService {
 	}
 
 	public void ticketRoleTypeOption(TicketRole ticketRole) {
-		String INSERT_QUERY = null;
+		String INSERT_QUERY = "INSERT into CBP_TKT_ROLE_OP_TYPE(ROLE_ID,OP_TYPE_ID,IS_LOCKED,CREATED_TS,UPDATED_TS,DELETED_TS,IS_DELETED) VALUES(?,?,?,?,?,?,?)";
+
 		List<Object[]> inputList = new ArrayList<Object[]>();
 		List<Integer> list = ticketRole.getOptionTypeIds();
 		TicketRoleTypeOption ticketRoleTypeOption = ticketRole.getTicketRoleTypeOption();
 		for (int i = 0; i < list.size(); i++) {
 			int optionId = list.get(i);
-			INSERT_QUERY = "INSERT into CBP_TKT_ROLE_OP_TYPE(ROLE_ID,OP_TYPE_ID,IS_LOCKED,CREATED_TS,UPDATED_TS,DELETED_TS,IS_DELETED) VALUES(?,?,?,?,?,?,?)";
 			Object[] tmps = new Object[] { ticketRole.getRoleId(), optionId, ticketRoleTypeOption.getIsLocked(),
 					ticketRoleTypeOption.getCreatedDate(), ticketRoleTypeOption.getModifiedDate(),
 					ticketRoleTypeOption.getDeletedDate(), "N" };
@@ -609,14 +615,14 @@ public class TicketingImpl implements TicketingDaoService {
 	
 	
 	public void deleteRoleTypes(TicketRole ticketRole) {
-		String UPDATE_QUERY = null;
+		String  UPDATE_QUERY = "UPDATE CBP_TKT_ROLE_OP_TYPE set DELETED_TS = ?, IS_DELETED = ? where  ROLE_ID=? AND OP_TYPE_ID = ?";
+
 		List<Object[]> inputList = new ArrayList<Object[]>();
 		List<Integer> list = ticketRole.getDeletedTypeIds();
 		
 		TicketRoleTypeOption ticketRoleTypeOption = ticketRole.getTicketRoleTypeOption();
 		for (int i = 0; i < list.size(); i++) {
 			int optionId = list.get(i);
-			 UPDATE_QUERY = "UPDATE CBP_TKT_ROLE_OP_TYPE set DELETED_TS = ?, IS_DELETED = ? where  ROLE_ID=? AND OP_TYPE_ID = ?";
 
 			//INSERT_QUERY = "INSERT into CBP_TKT_ROLE_OP_TYPE(ROLE_ID,OP_TYPE_ID,IS_LOCKED,CREATED_TS,UPDATED_TS,DELETED_TS,IS_DELETED) VALUES(?,?,?,?,?,?,?)";
 			Object[] tmps = new Object[] {ticketRoleTypeOption.getDeletedDate(),"Y",ticketRole.getRoleId(), optionId};
@@ -630,5 +636,32 @@ public class TicketingImpl implements TicketingDaoService {
 		deleteRoleTypes(ticketRole);
 		ticketRoleTypeOption(ticketRole);
 	}
+	public List<TicketRole> getListRoles( ) { 
+		List<TicketRole> roleList = null;
+		try {
+			String QUERY = "SELECT * FROM  CBP_TKT_ROLE WHERE IS_DELETED='N'";
+			roleList = jdbcTemplate.query(QUERY, new RowMapper<TicketRole>() {
+//		String QUERY = "INSERT into CBP_TKT_ROLE(ROLE_ID,ROLE_NAME,CREATED_TS,UPDATED_TS,DELETED_TS,IS_DELETED) VALUES(? , ? , ? , ? , ? , ?)";
+
+				public TicketRole mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+					TicketRole ticketRole = new TicketRole();
+					ticketRole.setRoleId(resultSet.getInt("ROLE_ID"));
+					ticketRole.setRoleName(resultSet.getString("ROLE_NAME"));
+					ticketRole.setCreatedDate(resultSet.getDate("CREATED_TS"));
+					ticketRole.setModifiedDate(resultSet.getDate("UPDATED_TS"));
+					ticketRole.setDeletedDate(resultSet.getDate("DELETED_TS"));
+					ticketRole.setIsDeleted(resultSet.getString("IS_DELETED"));
+					return ticketRole;
+				}
+			});
+		} catch (Exception e) {
+
+		}
+		return roleList;
+
+	}
+
+		
+	
 	
 }
