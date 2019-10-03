@@ -577,41 +577,32 @@ public class TicketingController {
 	@PostMapping(path = "/showUpdateRole")
 	public ResponseEntity<?> showUpdateRoles(@RequestBody TicketRole ticketRole) {
 		ResponseBodyHelper responseBody = new ResponseBodyHelper();
-		List<String> unAssign = new ArrayList<String>();
-		List<String> assign = new ArrayList<String>();
 		
 		List<OptionType> OptionTypeLists = ticket.getListOfOptionTypes();
-		List<OptionType> list = ticket.getSeletedOptionTypes(ticketRole);
-		
-		for (int i = 0; i < OptionTypeLists.size(); i++) {
-			String id = OptionTypeLists.get(i).getOpTypeName();
-			unAssign.add(id);
-		}
-		for (int i = 0; i < list.size(); i++) {
-			String id = list.get(i).getOpTypeName();
-			assign.add(id);
-		}
-		
-		Set<OptionType> remove = new HashSet<>();
-		
+		List<OptionType> assignList = ticket.getSeletedOptionTypes(ticketRole);
+		List<OptionType> unAssign = ticket.getListOfOptionTypes();
+		List<OptionType> ls= unAssign ;
 		
 		for (int i = 0; i < OptionTypeLists.size(); i++) {
 			int unassignId = OptionTypeLists.get(i).getOpTypeId();
-			for (int j = 0; j < list.size(); j++) {
-				int assignId = list.get(j).getOpTypeId();
-				if (unassignId != assignId) {
-					remove.add(OptionTypeLists.get(i));
+			System.out.println("unassignId"+unassignId);
+			for (int j = 0; j < assignList.size(); j++) {
+				int assignId = assignList.get(j).getOpTypeId();
+				System.out.println(assignId);
+				if (assignId==unassignId) {
+					unAssign.remove(i);
+					System.out.println("hi");
+//					ls.remove(OptionTypeLists.get(i));
 				}
 			}
-			
 		}
+		ticketRole.setAssign(assignList);
+		ticketRole.setUnassign(unAssign);
 		
-		unAssign.removeAll(remove);
-		System.out.println("remove"+unAssign);
 		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 		responseBody.setReqStatus("success");
 		responseBody.setMessage("ListOfOptionTypes is found");
-		responseBody.setResult(remove);
+		responseBody.setResult(ticketRole);
 	
 	return ResponseEntity.ok(responseBody);
 }

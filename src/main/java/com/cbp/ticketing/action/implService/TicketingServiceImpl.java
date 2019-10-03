@@ -240,7 +240,7 @@ public void UpdateRoleTypes(TicketRole ticketRole) {
 	ticketRole.setTicketRoleTypeOption(ticketRoleTypeOption);
 	service.UpdateRoleTypes(ticketRole);
 }
-public List<TicketRole> getListRoles( ) {
+public List<TicketRole> getListRoles() {
 	List<TicketRole> list=service.getListRoles();
 	return list;
 }

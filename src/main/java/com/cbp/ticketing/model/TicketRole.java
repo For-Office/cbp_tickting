@@ -12,6 +12,20 @@ public class TicketRole {
 	private String isDeleted;
 	private List<Integer> optionTypeIds;
 	private List<Integer> deletedTypeIds;
+	private List<OptionType> assign;
+	private List<OptionType> unassign;
+	public List<OptionType> getAssign() {
+		return assign;
+	}
+	public void setAssign(List<OptionType> assign) {
+		this.assign = assign;
+	}
+	public List<OptionType> getUnassign() {
+		return unassign;
+	}
+	public void setUnassign(List<OptionType> unassign) {
+		this.unassign = unassign;
+	}
 	private TicketRoleTypeOption ticketRoleTypeOption;
 	public List<Integer> getOptionTypeIds() {
 		return optionTypeIds;
