@@ -79,4 +79,5 @@ public interface TicketingService {
 	public List<OptionType> getSeletedOptionTypes(TicketRole ticketRole);
 	public void UpdateRoleTypes(TicketRole ticketRole);
 	public List<TicketRole> getListRoles() ;
+	public void deletedRole(TicketRole ticketRole);
 }

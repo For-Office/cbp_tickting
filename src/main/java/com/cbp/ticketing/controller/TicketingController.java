@@ -604,7 +604,6 @@ public class TicketingController {
 		}
 		ticketRole.setAssign(assignList);
 		ticketRole.setUnassign(unAssinList);
-		
 		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 		responseBody.setReqStatus("success");
 		responseBody.setMessage("ListOfOptionTypes is found");
@@ -612,5 +611,17 @@ public class TicketingController {
 	
 	return ResponseEntity.ok(responseBody);
 }
+
+		@PostMapping(path = "/deleteRole")
+		public ResponseEntity<?> deletedRole(@RequestBody TicketRole ticketRole) {
+			ResponseBodyHelper responseBody = new ResponseBodyHelper();
+			ticket.deletedRole(ticketRole);
+			responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
+			responseBody.setReqStatus("success");
+			responseBody.setMessage("role is deleted");
+			return ResponseEntity.ok(responseBody);
+
+		}
+	
 	}
 	

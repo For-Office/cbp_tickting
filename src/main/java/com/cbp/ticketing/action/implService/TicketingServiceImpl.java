@@ -46,7 +46,7 @@ public class TicketingServiceImpl implements TicketingService {
 	public void createTicketApp(TicketApp ticketApp) {
 		ticketApp.setCreatedDate(new Date());
 		ticketApp.setModifiedDate(new Date());
-		ticketApp.setDeleted_ts(ticketApp.getDeleted_ts());
+		ticketApp.setDeleted_ts(new Date());
 		ticketApp.setIs_deleted("N");
 		service.createTicketApp(ticketApp);
 		
@@ -243,6 +243,11 @@ public void UpdateRoleTypes(TicketRole ticketRole) {
 public List<TicketRole> getListRoles() {
 	List<TicketRole> list=service.getListRoles();
 	return list;
+}
+public void deletedRole(TicketRole ticketRole) {
+	ticketRole.setDeletedDate(new Date());
+	ticketRole.setIsDeleted("Y");
+	service.deletedRole(ticketRole);
 }
 
 }
