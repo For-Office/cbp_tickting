@@ -509,7 +509,7 @@ public class TicketingController {
 		ticket.createTicketRole(ticketRole);
 		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 		responseBody.setReqStatus("success");
-		responseBody.setMessage("role is  created successfully");
+		responseBody.setMessage(errorcodes.getERRORS_NEWROLECREATION_SUCCESS());
 		return ResponseEntity.ok(responseBody);
 
 	}
@@ -550,7 +550,7 @@ public class TicketingController {
 
 		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 		responseBody.setReqStatus("success");
-		responseBody.setMessage("updated");
+		responseBody.setMessage(errorcodes.getERRORS_NEWROLEUPDATED_SUCCESS());
 		//responseBody.setResult(list);
 		return ResponseEntity.ok(responseBody);
 	}
@@ -618,7 +618,7 @@ public class TicketingController {
 			ticket.deletedRole(ticketRole);
 			responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 			responseBody.setReqStatus("success");
-			responseBody.setMessage("role is deleted");
+			responseBody.setMessage(errorcodes.getERRORS_DELETEDROLE_SUCCESS());
 			return ResponseEntity.ok(responseBody);
 
 		}
