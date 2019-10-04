@@ -14,6 +14,7 @@ public class TicketRole {
 	private List<Integer> deletedTypeIds;
 	private List<OptionType> assign;
 	private List<OptionType> unassign;
+	
 	public List<OptionType> getAssign() {
 		return assign;
 	}

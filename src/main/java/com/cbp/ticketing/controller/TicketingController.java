@@ -577,27 +577,33 @@ public class TicketingController {
 	@PostMapping(path = "/showUpdateRole")
 	public ResponseEntity<?> showUpdateRoles(@RequestBody TicketRole ticketRole) {
 		ResponseBodyHelper responseBody = new ResponseBodyHelper();
-		
-		List<OptionType> OptionTypeLists = ticket.getListOfOptionTypes();
+		List<OptionType>OptionTypeLists = ticket.getListOfOptionTypes();
 		List<OptionType> assignList = ticket.getSeletedOptionTypes(ticketRole);
-		List<OptionType> unAssign = ticket.getListOfOptionTypes();
-		List<OptionType> ls= unAssign ;
-		
-		for (int i = 0; i < OptionTypeLists.size(); i++) {
-			int unassignId = OptionTypeLists.get(i).getOpTypeId();
-			System.out.println("unassignId"+unassignId);
-			for (int j = 0; j < assignList.size(); j++) {
-				int assignId = assignList.get(j).getOpTypeId();
-				System.out.println(assignId);
-				if (assignId==unassignId) {
-					unAssign.remove(i);
-					System.out.println("hi");
-//					ls.remove(OptionTypeLists.get(i));
+		ArrayList<Integer> listOfUnAssignIds=new ArrayList<Integer>();
+		ArrayList<Integer> listOfAssignIds=new ArrayList<Integer>();
+		ArrayList<OptionType> unAssinList=new ArrayList<OptionType>();
+		int unassinId;
+		int assinId;
+		for(int i=0;i<OptionTypeLists.size();i++) {
+			unassinId=OptionTypeLists.get(i).getOpTypeId();
+			listOfUnAssignIds.add(unassinId);
+		}
+		for(int i=0;i<assignList.size();i++) {
+			assinId=assignList.get(i).getOpTypeId();
+			listOfAssignIds.add(assinId);
+		}
+	
+		listOfUnAssignIds.removeAll(listOfAssignIds);
+		for(int i=0;i < listOfUnAssignIds.size() ;i++) {
+			int value=listOfUnAssignIds.get(i);
+			for(int j=0;j < OptionTypeLists.size() ;j++) {
+				if(value==OptionTypeLists.get(j).getOpTypeId()) {
+					unAssinList.add(OptionTypeLists.get(j));
 				}
 			}
 		}
 		ticketRole.setAssign(assignList);
-		ticketRole.setUnassign(unAssign);
+		ticketRole.setUnassign(unAssinList);
 		
 		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 		responseBody.setReqStatus("success");
@@ -606,4 +612,5 @@ public class TicketingController {
 	
 	return ResponseEntity.ok(responseBody);
 }
-}
+	}
+	
