@@ -232,32 +232,38 @@ public class TicketingImpl implements TicketingDaoService {
 	// TicketResource
 
 	public void createTicketRes(TicketResource ticketResource) {
-		int id;
-		String QUERY = "INSERT into CBP_TKT_RES(RES_ID,RES_NAME,RES_TYPE_ID,CREATED_TS,UPDATED_TS,DELETED_TS,IS_DELETED) values(? , ? , ? , ? , ? ,? ,?)";
-		id = getMaxId("RES_ID", "CBP_TKT_RES") + 1;
-		List<Object[]> inputList = new ArrayList<Object[]>();
-		List list = ticketResource.getResNames();
-		List<Integer> ids = ticketResource.getResTypeIds();
-		System.out.println(id);
-		for (int i = 0; i < list.size(); i++) {
-
-			ticketResource.setResId(id);
-			ticketResource.setResName(list.get(i).toString());
-			ticketResource.setResTypeId(ids.get(i));
-			/*
-			 * logger.info("Application name" + list.get(i).toString());
-			 * logger.info("Application name" + list.get(j));
-			 */
-			Object[] tmp = new Object[] { ticketResource.getResId(), ticketResource.getResName(),
-					ticketResource.getResTypeId(), ticketResource.getCreatedDate(), ticketResource.getModifiedDate(),
-					ticketResource.getDeletedDate(),ticketResource.getIsDeleted() };
-			inputList.add(tmp);
-			id++;
-
-		}
-
-		jdbcTemplate.batchUpdate(QUERY, inputList);
+		int resId = getMaxId("RES_ID", "CBP_TKT_RES") + 1;
+		System.out.println("id...."+resId);
+		ticketResource.setResId(resId);
+		String QUERY = "INSERT into CBP_TKT_RES(RES_ID,RES_TYPE_ID,CREATED_TS,UPDATED_TS,DELETED_TS,IS_DELETED) values(? , ? , ? , ? , ? ,?)";
+			Object[] tmp = new Object[] { ticketResource.getResId(), ticketResource.getResTypeId(),
+					ticketResource.getCreatedDate(), ticketResource.getModifiedDate(), ticketResource.getDeletedDate(),
+					ticketResource.getIsDeleted() };   
+			jdbcTemplate.update(QUERY, tmp);
+		createResCredentials(ticketResource);
 	}
+	public void createResCredentials(TicketResource ticketResource) {
+		List<Object[]> inputLists = new ArrayList<Object[]>();
+		//int id=ticketResource.getResId();
+		System.out.println("id...."+ticketResource.getResId());
+		TicketResCredentials ticketResCredentials = ticketResource.getTicketResCredentials();
+		List<String> resourceTypekeys = ticketResource.getResTypeKeys();
+		String SECOUND_QUERY = "INSERT into CBP_TKT_RES_CRED(RES_ID,RES_KEY,RES_VALUE,IS_ENCRYPTED,CREATED_TS,UPDATED_TS,DELETED_TS,IS_DELETED) values(? , ? , ? , ? , ? ,? ,? ,?)";
+List<String> listOfValues=ticketResource.getResTypeValues();
+		for (int i = 0; i < resourceTypekeys.size(); i++) {
+			String key=resourceTypekeys.get(i).toString();
+			String value=listOfValues.get(i).toString();
+			System.out.println(key);
+			Object[] tmp = new Object[] { ticketResource.getResId(),key ,
+					value,ticketResCredentials.getIsEncrypted(),  ticketResCredentials.getCreatedDate(),
+					ticketResCredentials.getModifiedDate(), ticketResCredentials.getDeletedDate(),
+					ticketResCredentials.getIsDeleted() };
+			inputLists.add(tmp);
+		}
+		jdbcTemplate.batchUpdate(SECOUND_QUERY, inputLists);
+		System.out.println("success");
+	}
+
 
 	public List<TicketResource> getTicketResourceList() {
 		List<TicketResource> ticketResList = new ArrayList<TicketResource>();
@@ -350,12 +356,11 @@ public class TicketingImpl implements TicketingDaoService {
 	}
 
 	public List<TicketEnvType> getEnvTypes(TicketEnvResTeamApp ticketEnvResTeamApp) {
-		String QUERY = "SELECT * FROM CBP_TKT_ENV_TYPE WHERE ENV_TYPE_ID IN (SELECT ENV_TYPE_ID FROM CBP_TKT_TEAM_RES_ENV_APP where TEAM_ID= ? AND APP_ID= ? AND ENV_TYPE_ID= ?)";
+		String QUERY = "SELECT * FROM CBP_TKT_ENV_TYPE WHERE ENV_TYPE_ID IN (SELECT ENV_TYPE_ID FROM CBP_TKT_APP_ENV_PROMO where  APP_ID= ?)";
 
 		List<TicketEnvType> ticketEnvTypeList = new ArrayList<TicketEnvType>();
 
-		Object[] a = new Object[] { ticketEnvResTeamApp.getTeamId(), ticketEnvResTeamApp.getAppId(),
-				ticketEnvResTeamApp.getEnvTypeId() };
+		Object[] a = new Object[] { ticketEnvResTeamApp.getAppId()};
 
 		ticketEnvTypeList = jdbcTemplate.query(QUERY, a, new RowMapper<TicketEnvType>() {
 
@@ -363,8 +368,11 @@ public class TicketingImpl implements TicketingDaoService {
 				TicketEnvType ticketEnvType = new TicketEnvType();
 				ticketEnvType.setEnvTypeId(resultSet.getInt("ENV_TYPE_ID"));
 				ticketEnvType.setEnvTypeName(resultSet.getString("ENV_TYPE_NAME"));
-				ticketEnvType.setCreatedDate(resultSet.getDate("CBP_CREATED_TIMESTAMP"));
-				ticketEnvType.setModifiedDate(resultSet.getDate("CBP_UPDATED_TIMESTAMP"));
+				ticketEnvType.setCreatedDate(resultSet.getDate("CREATED_TS"));
+				ticketEnvType.setModifiedDate(resultSet.getDate("UPDATED_TS"));
+				ticketEnvType.setDeleted_ts(resultSet.getDate("DELETED_TS"));
+				ticketEnvType.setIs_deleted(resultSet.getString("IS_DELETED"));
+
 				return ticketEnvType;
 			}
 		});
@@ -432,7 +440,7 @@ public class TicketingImpl implements TicketingDaoService {
 				TicketResCredentials.setResId(resultSet.getInt("RES_ID"));
 				TicketResCredentials.setResKey(resultSet.getString("RES_KEY"));
 				TicketResCredentials.setResValue(resultSet.getString("RES_VALUE"));
-				TicketResCredentials.setIs_encrypted(resultSet.getString("IS_ENCRYPTED"));
+				TicketResCredentials.setIsEncrypted(resultSet.getString("IS_ENCRYPTED"));
 				return TicketResCredentials;
 			}
 		});
@@ -529,6 +537,16 @@ public class TicketingImpl implements TicketingDaoService {
 		return userList;
 
 	}
+	public void deletedUser(TicketUser ticketUser) {
+		String UPDATE_QUERY = "UPDATE CBP_TKT_USER set USER_NAME = ? where  USER_ID=?";
+		Object[] a = new Object[] {ticketUser.getIsDeleted() ,ticketUser.getUserId()  };
+		jdbcTemplate.update(UPDATE_QUERY, a);
+	}
+	public void updateUser(TicketUser ticketUser) {
+		String UPDATE_QUERY = "UPDATE CBP_TKT_USER set IS_DELETED = ? USER_PASSWORD= ? IS_SITE_ADMIN=? where  USER_ID=?";
+		Object[] a = new Object[] {ticketUser.getUserName(), ticketUser.getPassword(),ticketUser.getIsSiteAdmin(),ticketUser.getUserId()  };
+		jdbcTemplate.update(UPDATE_QUERY, a);
+	}
 
 	public List<OptionType> getListOfOptionTypes() {
 		List<OptionType> ListOfOptions = null;
@@ -591,8 +609,7 @@ public class TicketingImpl implements TicketingDaoService {
 
 	public List<OptionType> getSeletedOptionTypes(TicketRole ticketRole) {
 		List<OptionType> ListOfOptions = null;
-		String UPDATE_QUERY = "select * from CBP_TKT_OP_TYPE where OP_TYPE_ID IN(select OP_TYPE_ID from  CBP_TKT_ROLE_OP_TYPE where ROLE_ID="
-				+ ticketRole.getRoleId() + ") AND IS_DELETED='N'";
+		String UPDATE_QUERY = "select * from CBP_TKT_OP_TYPE where OP_TYPE_ID IN(select OP_TYPE_ID from  CBP_TKT_ROLE_OP_TYPE where ROLE_ID="+ ticketRole.getRoleId() + " AND IS_DELETED='N') AND IS_DELETED='N'";
 
 		try {
 			ListOfOptions = jdbcTemplate.query(UPDATE_QUERY, new RowMapper<OptionType>() {
@@ -674,5 +691,6 @@ public class TicketingImpl implements TicketingDaoService {
 				jdbcTemplate.update(DELETE_QUERY, a);
 	}
 
+	
 
 }

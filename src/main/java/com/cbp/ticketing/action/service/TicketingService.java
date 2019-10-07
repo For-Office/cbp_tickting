@@ -18,7 +18,12 @@ import com.cbp.ticketing.model.UserLogin;
 
 public interface TicketingService {
 	public List<TicketUser> login(TicketUser user);
+
 	public List<TicketUser> getTicketUserList();
+
+	public void deletedUser(TicketUser ticketUser);
+	
+	public void updateUser(TicketUser ticketUser);
 
 //TeamApp 
 	public void createTicketApp(TicketApp ticketApp);
@@ -30,13 +35,15 @@ public interface TicketingService {
 	public boolean deleteTicketApp(TicketApp ticketApp) throws SQLException;
 
 //TicketTeam
-	/*public void createTicketTeam(TicketTeam ticketTeam);
-
-	public List<TicketTeam> getTicketTeamList();
-
-	public void updateTicketTeam(TicketTeam ticketTeam);
-
-	public void deleteTicketTeam(TicketTeam ticketTeam);*/
+	/*
+	 * public void createTicketTeam(TicketTeam ticketTeam);
+	 * 
+	 * public List<TicketTeam> getTicketTeamList();
+	 * 
+	 * public void updateTicketTeam(TicketTeam ticketTeam);
+	 * 
+	 * public void deleteTicketTeam(TicketTeam ticketTeam);
+	 */
 
 //TicketResource
 	public void createTicketRes(TicketResource ticketResource);
@@ -72,12 +79,20 @@ public interface TicketingService {
 	public List<TicketResource> getResNames(TicketEnvResTeamApp ticketEnvResTeamApp);
 
 	public List<TicketResCredentials> getResCredentials(TicketResource ticketResource);
+
 	public List<TicketResSubType> getTicketResSubTypeList();
+
 	public void createTicketUser(TicketUser ticketUser);
+
 	public List<OptionType> getListOfOptionTypes();
+
 	public void createTicketRole(TicketRole ticketRole);
+
 	public List<OptionType> getSeletedOptionTypes(TicketRole ticketRole);
+
 	public void UpdateRoleTypes(TicketRole ticketRole);
-	public List<TicketRole> getListRoles() ;
+
+	public List<TicketRole> getListRoles();
+
 	public void deletedRole(TicketRole ticketRole);
 }

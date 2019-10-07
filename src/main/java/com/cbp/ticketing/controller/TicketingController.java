@@ -456,7 +456,7 @@ public class TicketingController {
 		ticket.createTicketUser(ticketUser);
 		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 		responseBody.setReqStatus("success");
-		responseBody.setMessage("user created successfully");
+		responseBody.setMessage(errorcodes.getERRORS_NEWUSERCREATION_SUCCESS());
 
 		return ResponseEntity.ok(responseBody);
 
@@ -478,6 +478,28 @@ public class TicketingController {
 			responseBody.setMessage("TicketAppList is not found");
 		}
 
+		return ResponseEntity.ok(responseBody);
+
+	}
+
+	@PostMapping(path = "/deleteUser")
+	public ResponseEntity<?> deletedUser(@RequestBody TicketUser ticketUser) {
+		ResponseBodyHelper responseBody = new ResponseBodyHelper();
+		ticket.deletedUser(ticketUser);
+		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
+		responseBody.setReqStatus("success");
+		responseBody.setMessage(errorcodes.getERRORS_USERDELETED_SUCCESS());
+		return ResponseEntity.ok(responseBody);
+
+	}
+	
+	@PostMapping(path = "/updateUser")
+	public ResponseEntity<?> updateUser(@RequestBody TicketUser ticketUser) {
+		ResponseBodyHelper responseBody = new ResponseBodyHelper();
+		ticket.updateUser(ticketUser);
+		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
+		responseBody.setReqStatus("success");
+		responseBody.setMessage(errorcodes.getERRORS_USERUPDATED_SUCCESS());
 		return ResponseEntity.ok(responseBody);
 
 	}
@@ -524,7 +546,6 @@ public class TicketingController {
 		List<Integer> updatelist = new ArrayList();
 		int id1 = 0;
 		int id2 = 0;
-
 		List remove = new ArrayList<>();
 		for (int i = 0; i < list.size(); i++) {
 			int id = list.get(i).getOpTypeId();

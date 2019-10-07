@@ -41,7 +41,14 @@ public class TicketingServiceImpl implements TicketingService {
 	List list=service.getTicketUserList();
 	return list;
 	}
+	public void deletedUser(TicketUser ticketUser) {
+		ticketUser.setIsDeleted("Y");
+		service.deletedUser(ticketUser);
+	}
 
+	public void updateUser(TicketUser ticketUser) {
+		service.updateUser(ticketUser);
+	}
 //TicketApp 
 	public void createTicketApp(TicketApp ticketApp) {
 		ticketApp.setCreatedDate(new Date());
@@ -65,6 +72,7 @@ public class TicketingServiceImpl implements TicketingService {
 
 	public boolean deleteTicketApp(TicketApp ticketApp)throws SQLException {
 		ticketApp.setDeleted_ts(new Date());
+		ticketApp.setIs_deleted("Y");
 		boolean flag = service.deleteTicketApp(ticketApp);
 		return flag;
 	}
@@ -96,7 +104,16 @@ public class TicketingServiceImpl implements TicketingService {
 	public void createTicketRes(TicketResource ticketResource) {
 		ticketResource.setCreatedDate(new Date());
 		ticketResource.setModifiedDate(new Date());
+		ticketResource.setDeletedDate(new Date());
 		ticketResource.setIsDeleted("N");
+		TicketResCredentials ticketResCredentials=new TicketResCredentials();
+		ticketResCredentials.setCreatedDate(new Date());
+		ticketResCredentials.setModifiedDate(new Date());
+		ticketResCredentials.setDeletedDate(new Date());
+		
+		ticketResCredentials.setIsDeleted("N");
+		ticketResCredentials.setIsEncrypted("N");
+		ticketResource.setTicketResCredentials(ticketResCredentials);
 		service.createTicketRes(ticketResource);
 
 	}
@@ -165,6 +182,7 @@ public class TicketingServiceImpl implements TicketingService {
 
 	public void deleteTicketEnvType(TicketEnvType ticketEnvType) {
 		ticketEnvType.setDeleted_ts(new Date());
+		ticketEnvType.setIs_deleted("Y");
 		service.deleteTicketEnvType(ticketEnvType);
 
 	}

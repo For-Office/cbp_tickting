@@ -11,6 +11,9 @@ public class TicketResource {
 	private Date modifiedDate;
 	private Date deletedDate;
 	private String isDeleted;
+	private TicketResCredentials ticketResCredentials;
+	private List<String> resTypeKeys;
+	private List<String> resTypeValues;
 	private List resNames;
 	private List<Integer> resTypeIds;
 	public Date getCreatedDate() {
@@ -91,5 +94,36 @@ public class TicketResource {
 	public void setDeletedDate(Date deletedDate) {
 		this.deletedDate = deletedDate;
 	}
+	public TicketResCredentials getTicketResCredentials() {
+		return ticketResCredentials;
+	}
+	public void setTicketResCredentials(TicketResCredentials ticketResCredentials) {
+		this.ticketResCredentials = ticketResCredentials;
+	}
+	/**
+	 * @return the resTypeKeys
+	 */
+	public List<String> getResTypeKeys() {
+		return resTypeKeys;
+	}
+	/**
+	 * @param resTypeKeys the resTypeKeys to set
+	 */
+	public void setResTypeKeys(List<String> resTypeKeys) {
+		this.resTypeKeys = resTypeKeys;
+	}
+	/**
+	 * @return the resTypeValues
+	 */
+	public List<String> getResTypeValues() {
+		return resTypeValues;
+	}
+	/**
+	 * @param resTypeValues the resTypeValues to set
+	 */
+	public void setResTypeValues(List<String> resTypeValues) {
+		this.resTypeValues = resTypeValues;
+	}
+	
 	
 }

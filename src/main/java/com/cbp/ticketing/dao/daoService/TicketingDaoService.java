@@ -20,6 +20,8 @@ public interface TicketingDaoService {
 	public List<TicketUser> login(TicketUser user);
 
 	public List<TicketUser> getTicketUserList();
+	public void deletedUser(TicketUser ticketUser) ;
+	public void updateUser(TicketUser ticketUser);
 
 	// TeamApp
 	public void createTicketApp(TicketApp ticketApp);
