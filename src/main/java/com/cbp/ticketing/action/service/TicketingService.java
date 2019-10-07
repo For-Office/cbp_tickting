@@ -48,14 +48,14 @@ public interface TicketingService {
 //TicketResource
 	public void createTicketRes(TicketResource ticketResource);
 
-	public List<TicketResource> getTicketResourceList();
+	//public List<TicketResource> getTicketResourceList();
 
 	public void updateTicketResource(TicketResource ticketRes);
 
 	public void deleteTicketResource(TicketResource ticketRes);
 //TicketResourceType
 
-	public void createTicketResType(TicketResourceType ticketResourceType);
+	//public void createTicketResType(TicketResourceType ticketResourceType);
 
 	public List<TicketResourceType> getTicketResorceTypeList();
 
@@ -95,4 +95,5 @@ public interface TicketingService {
 	public List<TicketRole> getListRoles();
 
 	public void deletedRole(TicketRole ticketRole);
+	public List<OptionType> getIsDeleted(TicketRole ticketRole);
 }

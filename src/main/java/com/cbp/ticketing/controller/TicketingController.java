@@ -189,11 +189,11 @@ public class TicketingController {
 		return ResponseEntity.ok(responseBody);
 	}
 
-	@GetMapping(path = "/getTicketResourceList")
-	public ResponseEntity<?> getTicketResourceList() {
+	@GetMapping(path = "/getTicketResourceTypeList")
+	public ResponseEntity<?> getTicketResourceTypeList() {
 		ResponseBodyHelper responseBody = new ResponseBodyHelper();
-		List<TicketResource> ticketResorceTypeList = new ArrayList<TicketResource>();
-		ticketResorceTypeList = ticket.getTicketResourceList();
+		List<TicketResourceType> ticketResorceTypeList = new ArrayList<TicketResourceType>();
+		ticketResorceTypeList = ticket.getTicketResorceTypeList();
 		if (ticketResorceTypeList.size() > 0) {
 			responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 			responseBody.setReqStatus("success");
@@ -205,6 +205,7 @@ public class TicketingController {
 		}
 
 		return ResponseEntity.ok(responseBody);
+
 	}
 
 	@PostMapping(path = "/updateTicketResource")
@@ -284,7 +285,7 @@ public class TicketingController {
 
 	// TicketResType Controllers
 
-	@PostMapping(path = "/saveTicketResType")
+	/*@PostMapping(path = "/saveTicketResType")
 	public ResponseEntity<?> saveTicketResType(@RequestBody TicketResourceType ticketResourceType) {
 		ResponseBodyHelper responseBody = new ResponseBodyHelper();
 
@@ -295,24 +296,7 @@ public class TicketingController {
 		return ResponseEntity.ok(responseBody);
 	}
 
-	@GetMapping(path = "/getTicketResourceTypeList")
-	public ResponseEntity<?> getTicketResourceTypeList() {
-		ResponseBodyHelper responseBody = new ResponseBodyHelper();
-		List<TicketResourceType> ticketResorceTypeList = new ArrayList<TicketResourceType>();
-		ticketResorceTypeList = ticket.getTicketResorceTypeList();
-		if (ticketResorceTypeList.size() > 0) {
-			responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
-			responseBody.setReqStatus("success");
-			responseBody.setMessage("TicketResourceTypeList is found");
-			responseBody.setResult(ticketResorceTypeList);
-		} else {
-			responseBody.setReqStatus("failed");
-			responseBody.setMessage("TicketResourceTypeList is not found");
-		}
-
-		return ResponseEntity.ok(responseBody);
-
-	}
+	
 
 	@PostMapping(path = "/updateTicketResourceType")
 	public ResponseEntity<?> updateTicketResourceType(@RequestBody TicketResourceType ticketResType) {
@@ -335,8 +319,8 @@ public class TicketingController {
 		return ResponseEntity.ok(responseBody);
 
 	}
-
-	@PostMapping(path = "/getAppNames")
+*/
+	/*@PostMapping(path = "/getAppNames")
 	public ResponseEntity<?> getAppNames(@RequestBody TicketTeam ticketTeam) {
 		System.out.println("hello");
 		ResponseBodyHelper responseBody = new ResponseBodyHelper();
@@ -356,7 +340,7 @@ public class TicketingController {
 
 		return ResponseEntity.ok(responseBody);
 
-	}
+	}*/
 
 	@PostMapping(path = "/getEnvTypes")
 	public ResponseEntity<?> getEnvTypes(@RequestBody TicketEnvResTeamApp ticketEnvResTeamApp) {
@@ -540,7 +524,6 @@ public class TicketingController {
 	public ResponseEntity<?> getSeletedOptionTypes(@RequestBody TicketRole ticketRole) {
 		ResponseBodyHelper responseBody = new ResponseBodyHelper();
 		List<OptionType> list = ticket.getSeletedOptionTypes(ticketRole);
-		// List unassignList=ticketRole.getDeletedTypeIds();
 		List<Integer> InsertOpsIds = ticketRole.getOptionTypeIds();
 		List<Integer> deletedOpsIds = new ArrayList();
 		List<Integer> updatelist = new ArrayList();
@@ -565,8 +548,8 @@ public class TicketingController {
 		InsertOpsIds.removeAll(remove);
 		ticketRole.setDeletedTypeIds(deletedOpsIds);
 		ticketRole.setOptionTypeIds(InsertOpsIds);
-		// System.out.println("insertlist......"+insertlist);
-		// System.out.println("assignList......"+assignList);
+		/*System.out.println("deletedOpsIds......"+deletedOpsIds);
+		 System.out.println("InsertOpsIds......"+InsertOpsIds);*/
 		ticket.UpdateRoleTypes(ticketRole);
 
 		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
@@ -643,6 +626,7 @@ public class TicketingController {
 			return ResponseEntity.ok(responseBody);
 
 		}
+		
 	
 	}
 	

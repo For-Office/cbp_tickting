@@ -178,24 +178,22 @@ public class TicketingImpl implements TicketingDaoService {
 	 */
 	// TicketResourceType Query
 
-	public void createTicketResType(TicketResourceType ticketResourceType) {
-		int id;
-		String QUERY = "INSERT into CBP_TKT_RES_TYPE(RES_TYPE_ID,RES_TYPE_NAME,CREATED_TS,UPDATED_TS,DELETED_TS,IS_DELETED) values(? , ? , ? , ? ,? ,?)";
-		id = getMaxId("RES_TYPE_ID", "CBP_TKT_RES_TYPE") + 1;
-		List<Object[]> inputList = new ArrayList<Object[]>();
-		List list = ticketResourceType.getResTypeNames();
-		for (int i = 0; i < list.size(); i++) {
-			ticketResourceType.setResTypeId(id);
-			logger.info("Application name" + list.get(i).toString());
-			ticketResourceType.setResTypeName(list.get(i).toString());
-			Object[] tmp = new Object[] { ticketResourceType.getResTypeId(), ticketResourceType.getResTypeName(),
-					ticketResourceType.getCreatedDate(), ticketResourceType.getModifiedDate(),
-					ticketResourceType.getDeletedDate(), ticketResourceType.getIsDeleted() };
-			inputList.add(tmp);
-			id++;
-		}
-		jdbcTemplate.batchUpdate(QUERY, inputList);
-	}
+	/*
+	 * public void createTicketResType(TicketResourceType ticketResourceType) { int
+	 * id; String QUERY =
+	 * "INSERT into CBP_TKT_RES_TYPE(RES_TYPE_ID,RES_TYPE_NAME,CREATED_TS,UPDATED_TS,DELETED_TS,IS_DELETED) values(? , ? , ? , ? ,? ,?)"
+	 * ; id = getMaxId("RES_TYPE_ID", "CBP_TKT_RES_TYPE") + 1; List<Object[]>
+	 * inputList = new ArrayList<Object[]>(); List list =
+	 * ticketResourceType.getResTypeNames(); for (int i = 0; i < list.size(); i++) {
+	 * ticketResourceType.setResTypeId(id); logger.info("Application name" +
+	 * list.get(i).toString());
+	 * ticketResourceType.setResTypeName(list.get(i).toString()); Object[] tmp = new
+	 * Object[] { ticketResourceType.getResTypeId(),
+	 * ticketResourceType.getResTypeName(), ticketResourceType.getCreatedDate(),
+	 * ticketResourceType.getModifiedDate(), ticketResourceType.getDeletedDate(),
+	 * ticketResourceType.getIsDeleted() }; inputList.add(tmp); id++; }
+	 * jdbcTemplate.batchUpdate(QUERY, inputList); }
+	 */
 
 	public List<TicketResourceType> getTicketResorceTypeList() {
 		List<TicketResourceType> ticketResTypeList = new ArrayList<TicketResourceType>();
@@ -208,6 +206,8 @@ public class TicketingImpl implements TicketingDaoService {
 				ticketResType.setResTypeName(resultSet.getString("RES_TYPE_NAME"));
 				ticketResType.setCreatedDate(resultSet.getDate("CREATED_TS"));
 				ticketResType.setModifiedDate(resultSet.getDate("UPDATED_TS"));
+				ticketResType.setDeletedDate(resultSet.getDate("DELETED_TS"));
+				ticketResType.setIsDeleted(resultSet.getString("IS_DELETED"));
 				return ticketResType;
 			}
 		});
@@ -233,55 +233,48 @@ public class TicketingImpl implements TicketingDaoService {
 
 	public void createTicketRes(TicketResource ticketResource) {
 		int resId = getMaxId("RES_ID", "CBP_TKT_RES") + 1;
-		System.out.println("id...."+resId);
 		ticketResource.setResId(resId);
 		String QUERY = "INSERT into CBP_TKT_RES(RES_ID,RES_TYPE_ID,CREATED_TS,UPDATED_TS,DELETED_TS,IS_DELETED) values(? , ? , ? , ? , ? ,?)";
-			Object[] tmp = new Object[] { ticketResource.getResId(), ticketResource.getResTypeId(),
-					ticketResource.getCreatedDate(), ticketResource.getModifiedDate(), ticketResource.getDeletedDate(),
-					ticketResource.getIsDeleted() };   
-			jdbcTemplate.update(QUERY, tmp);
+		Object[] tmp = new Object[] { ticketResource.getResId(), ticketResource.getResTypeId(),
+				ticketResource.getCreatedDate(), ticketResource.getModifiedDate(), ticketResource.getDeletedDate(),
+				ticketResource.getIsDeleted() };
+		jdbcTemplate.update(QUERY, tmp);
 		createResCredentials(ticketResource);
 	}
+
 	public void createResCredentials(TicketResource ticketResource) {
 		List<Object[]> inputLists = new ArrayList<Object[]>();
-		//int id=ticketResource.getResId();
-		System.out.println("id...."+ticketResource.getResId());
 		TicketResCredentials ticketResCredentials = ticketResource.getTicketResCredentials();
 		List<String> resourceTypekeys = ticketResource.getResTypeKeys();
 		String SECOUND_QUERY = "INSERT into CBP_TKT_RES_CRED(RES_ID,RES_KEY,RES_VALUE,IS_ENCRYPTED,CREATED_TS,UPDATED_TS,DELETED_TS,IS_DELETED) values(? , ? , ? , ? , ? ,? ,? ,?)";
-List<String> listOfValues=ticketResource.getResTypeValues();
+		List<String> listOfValues = ticketResource.getResTypeValues();
 		for (int i = 0; i < resourceTypekeys.size(); i++) {
-			String key=resourceTypekeys.get(i).toString();
-			String value=listOfValues.get(i).toString();
-			System.out.println(key);
-			Object[] tmp = new Object[] { ticketResource.getResId(),key ,
-					value,ticketResCredentials.getIsEncrypted(),  ticketResCredentials.getCreatedDate(),
-					ticketResCredentials.getModifiedDate(), ticketResCredentials.getDeletedDate(),
-					ticketResCredentials.getIsDeleted() };
+			String key = resourceTypekeys.get(i).toString();
+			String value = listOfValues.get(i).toString();
+			Object[] tmp = new Object[] { ticketResource.getResId(), key, value, ticketResCredentials.getIsEncrypted(),
+					ticketResCredentials.getCreatedDate(), ticketResCredentials.getModifiedDate(),
+					ticketResCredentials.getDeletedDate(), ticketResCredentials.getIsDeleted() };
 			inputLists.add(tmp);
 		}
 		jdbcTemplate.batchUpdate(SECOUND_QUERY, inputLists);
-		System.out.println("success");
 	}
 
-
-	public List<TicketResource> getTicketResourceList() {
-		List<TicketResource> ticketResList = new ArrayList<TicketResource>();
-		String QUERY = "SELECT * FROM  CBP_TKT_RES WHERE IS_DELETED=N";
-		ticketResList = jdbcTemplate.query(QUERY, new RowMapper<TicketResource>() {
-			public TicketResource mapRow(ResultSet resultSet, int rowNum) throws SQLException {
-				TicketResource ticketRes = new TicketResource();
-				ticketRes.setResId(resultSet.getInt("RES_ID"));
-				ticketRes.setResName(resultSet.getString("RES_NAME"));
-				ticketRes.setResTypeId(resultSet.getInt("RES_TYPE_ID"));
-				ticketRes.setCreatedDate(resultSet.getDate("CREATED_TS"));
-				ticketRes.setModifiedDate(resultSet.getDate("UPDATED_TS"));
-				return ticketRes;
-			}
-		});
-
-		return ticketResList;
-	}
+	/*
+	 * public List<TicketResource> getTicketResourceList() { List<TicketResource>
+	 * ticketResList = new ArrayList<TicketResource>(); String QUERY =
+	 * "SELECT * FROM  CBP_TKT_RES_TYPE WHERE IS_DELETED='N'"; ticketResList =
+	 * jdbcTemplate.query(QUERY, new RowMapper<TicketResource>() { public
+	 * TicketResource mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+	 * TicketResource ticketRes = new TicketResource();
+	 * ticketRes.setResTypeId(resultSet.getInt("RES_TYPE_ID"));
+	 * ticketRes.setResName(resultSet.getString("RES_TYPE_NAME"));
+	 * ticketRes.setCreatedDate(resultSet.getDate("CREATED_TS"));
+	 * ticketRes.setModifiedDate(resultSet.getDate("UPDATED_TS"));
+	 * ticketRes.setIsDeleted(resultSet.getString("IS_DELETED")); return ticketRes;
+	 * } });
+	 * 
+	 * return ticketResList; }
+	 */
 
 	public void updateTicketResource(TicketResource ticketResource) {
 
@@ -360,7 +353,7 @@ List<String> listOfValues=ticketResource.getResTypeValues();
 
 		List<TicketEnvType> ticketEnvTypeList = new ArrayList<TicketEnvType>();
 
-		Object[] a = new Object[] { ticketEnvResTeamApp.getAppId()};
+		Object[] a = new Object[] { ticketEnvResTeamApp.getAppId() };
 
 		ticketEnvTypeList = jdbcTemplate.query(QUERY, a, new RowMapper<TicketEnvType>() {
 
@@ -537,14 +530,17 @@ List<String> listOfValues=ticketResource.getResTypeValues();
 		return userList;
 
 	}
+
 	public void deletedUser(TicketUser ticketUser) {
 		String UPDATE_QUERY = "UPDATE CBP_TKT_USER set USER_NAME = ? where  USER_ID=?";
-		Object[] a = new Object[] {ticketUser.getIsDeleted() ,ticketUser.getUserId()  };
+		Object[] a = new Object[] { ticketUser.getIsDeleted(), ticketUser.getUserId() };
 		jdbcTemplate.update(UPDATE_QUERY, a);
 	}
+
 	public void updateUser(TicketUser ticketUser) {
 		String UPDATE_QUERY = "UPDATE CBP_TKT_USER set IS_DELETED = ? USER_PASSWORD= ? IS_SITE_ADMIN=? where  USER_ID=?";
-		Object[] a = new Object[] {ticketUser.getUserName(), ticketUser.getPassword(),ticketUser.getIsSiteAdmin(),ticketUser.getUserId()  };
+		Object[] a = new Object[] { ticketUser.getUserName(), ticketUser.getPassword(), ticketUser.getIsSiteAdmin(),
+				ticketUser.getUserId() };
 		jdbcTemplate.update(UPDATE_QUERY, a);
 	}
 
@@ -573,13 +569,6 @@ List<String> listOfValues=ticketResource.getResTypeValues();
 	}
 
 	public void createTicketRole(TicketRole ticketRole) {
-
-		/*
-		 * String SELECTQUERY=
-		 * "SELECT ROLE_NAME FROM CBP_TKT_ROLE WHERE ROLE_NAME=ticketRole.getRoleName()"
-		 * ; jdbcTemplate.execute(SELECTQUERY);
-		 */
-
 		int id = getMaxId("ROLE_ID", "CBP_TKT_ROLE") + 1;
 		ticketRole.setRoleId(id);
 		String QUERY = "INSERT into CBP_TKT_ROLE(ROLE_ID,ROLE_NAME,CREATED_TS,UPDATED_TS,DELETED_TS,IS_DELETED) VALUES(? , ? , ? , ? , ? , ?)";
@@ -591,25 +580,60 @@ List<String> listOfValues=ticketResource.getResTypeValues();
 	}
 
 	public void ticketRoleTypeOption(TicketRole ticketRole) {
-		String INSERT_QUERY = "INSERT into CBP_TKT_ROLE_OP_TYPE(ROLE_ID,OP_TYPE_ID,IS_LOCKED,CREATED_TS,UPDATED_TS,DELETED_TS,IS_DELETED) VALUES(?,?,?,?,?,?,?)";
-
-		List<Object[]> inputList = new ArrayList<Object[]>();
+		List<OptionType> isDeletedList = getIsDeleted(ticketRole);
 		List<Integer> list = ticketRole.getOptionTypeIds();
-		TicketRoleTypeOption ticketRoleTypeOption = ticketRole.getTicketRoleTypeOption();
-		for (int i = 0; i < list.size(); i++) {
-			int optionId = list.get(i);
-			Object[] tmps = new Object[] { ticketRole.getRoleId(), optionId, ticketRoleTypeOption.getIsLocked(),
-					ticketRoleTypeOption.getCreatedDate(), ticketRoleTypeOption.getModifiedDate(),
-					ticketRoleTypeOption.getDeletedDate(), "N" };
-			inputList.add(tmps);
+		List isdeleted = new ArrayList<>();
+		List<Integer> isDeletedListIds = new ArrayList();
+		for (int i = 0; i < isDeletedList.size(); i++) {
+			int id = isDeletedList.get(i).getOpTypeId();
+
+			isDeletedListIds.add(id);
+		}
+		List remove = new ArrayList<>();
+		for (int i = 0; i < isDeletedListIds.size(); i++) {
+			int id = isDeletedListIds.get(i);
+
+			for (int j = 0; j < list.size(); j++) {
+				int id1 = list.get(j);
+				if (id == id1) {
+					isdeleted.add(id);
+				}
+			}
 		}
 
-		jdbcTemplate.batchUpdate(INSERT_QUERY, inputList);
+		list.removeAll(isdeleted);
+
+		if (list.size() > 0) {
+			String INSERT_QUERY = "INSERT into CBP_TKT_ROLE_OP_TYPE(ROLE_ID,OP_TYPE_ID,IS_LOCKED,CREATED_TS,UPDATED_TS,DELETED_TS,IS_DELETED) VALUES(?,?,?,?,?,?,?)";
+			List<Object[]> inputList = new ArrayList<Object[]>();
+			TicketRoleTypeOption ticketRoleTypeOption = ticketRole.getTicketRoleTypeOption();
+			for (int i = 0; i < list.size(); i++) {
+				int optionId = list.get(i);
+				Object[] tmps = new Object[] { ticketRole.getRoleId(), optionId, ticketRoleTypeOption.getIsLocked(),
+						ticketRoleTypeOption.getCreatedDate(), ticketRoleTypeOption.getModifiedDate(),
+						ticketRoleTypeOption.getDeletedDate(), "N" };
+				inputList.add(tmps);
+			}
+
+			jdbcTemplate.batchUpdate(INSERT_QUERY, inputList);
+		}
+
+		String UPDATE_QUERY = "UPDATE CBP_TKT_ROLE_OP_TYPE set IS_DELETED = ? where  ROLE_ID=? AND OP_TYPE_ID = ?";
+		List<Object[]> inputLists = new ArrayList<Object[]>();
+		for (int i = 0; i < isdeleted.size(); i++) {
+			System.out.println();
+			int optionId = (int) isdeleted.get(i);
+			Object[] tmps = new Object[] { "N", ticketRole.getRoleId(), optionId };
+			inputLists.add(tmps);
+		}
+
+		jdbcTemplate.batchUpdate(UPDATE_QUERY, inputLists);
 	}
 
 	public List<OptionType> getSeletedOptionTypes(TicketRole ticketRole) {
 		List<OptionType> ListOfOptions = null;
-		String UPDATE_QUERY = "select * from CBP_TKT_OP_TYPE where OP_TYPE_ID IN(select OP_TYPE_ID from  CBP_TKT_ROLE_OP_TYPE where ROLE_ID="+ ticketRole.getRoleId() + " AND IS_DELETED='N') AND IS_DELETED='N'";
+		String UPDATE_QUERY = "select * from CBP_TKT_OP_TYPE where OP_TYPE_ID IN(select OP_TYPE_ID from  CBP_TKT_ROLE_OP_TYPE where ROLE_ID="
+				+ ticketRole.getRoleId() + " AND IS_DELETED='N') AND IS_DELETED='N'";
 
 		try {
 			ListOfOptions = jdbcTemplate.query(UPDATE_QUERY, new RowMapper<OptionType>() {
@@ -618,6 +642,32 @@ List<String> listOfValues=ticketResource.getResTypeValues();
 					OptionType optionType = new OptionType();
 					optionType.setOpTypeId(resultSet.getInt("OP_TYPE_ID"));
 					optionType.setOpTypeName(resultSet.getString("OP_TYPE_NAME"));
+					optionType.setCreatedDate(resultSet.getDate("CREATED_TS"));
+					optionType.setModifiedDate(resultSet.getDate("UPDATED_TS"));
+					optionType.setDeletedDate(resultSet.getDate("DELETED_TS"));
+					optionType.setIsDeleted(resultSet.getString("IS_DELETED"));
+					return optionType;
+				}
+			});
+		} catch (Exception e) {
+
+		}
+		return ListOfOptions;
+
+	}
+
+	public List<OptionType> getIsDeleted(TicketRole ticketRole) {
+		List<OptionType> ListOfOptions = null;
+		String UPDATE_QUERY = "select * from CBP_TKT_ROLE_OP_TYPE where ROLE_ID ='" + ticketRole.getRoleId()
+				+ "' AND IS_DELETED='Y'";
+
+		try {
+			ListOfOptions = jdbcTemplate.query(UPDATE_QUERY, new RowMapper<OptionType>() {
+
+				public OptionType mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+					OptionType optionType = new OptionType();
+					optionType.setOpTypeId(resultSet.getInt("OP_TYPE_ID"));
+					// optionType.setOpTypeName(resultSet.getString("OP_TYPE_NAME"));
 					optionType.setCreatedDate(resultSet.getDate("CREATED_TS"));
 					optionType.setModifiedDate(resultSet.getDate("UPDATED_TS"));
 					optionType.setDeletedDate(resultSet.getDate("DELETED_TS"));
@@ -653,10 +703,28 @@ List<String> listOfValues=ticketResource.getResTypeValues();
 		jdbcTemplate.batchUpdate(UPDATE_QUERY, inputList);
 	}
 
+	public void updateIsdelete(TicketRole ticketRole) {
+		String UPDATE_QUERY = "UPDATE CBP_TKT_ROLE_OP_TYPE set DELETED_TS = ?, where  ROLE_ID=? AND OP_TYPE_ID = ?";
+
+		List<Object[]> inputList = new ArrayList<Object[]>();
+		List<Integer> list = ticketRole.getUpdateIsDeleted();
+
+		TicketRoleTypeOption ticketRoleTypeOption = ticketRole.getTicketRoleTypeOption();
+		for (int i = 0; i < list.size(); i++) {
+			int optionId = list.get(i);
+
+			Object[] tmps = new Object[] { "N", ticketRole.getRoleId(), optionId };
+			inputList.add(tmps);
+		}
+
+		jdbcTemplate.batchUpdate(UPDATE_QUERY, inputList);
+	}
+
 	public void UpdateRoleTypes(TicketRole ticketRole) {
 
 		deleteRoleTypes(ticketRole);
 		ticketRoleTypeOption(ticketRole);
+
 	}
 
 	public List<TicketRole> getListRoles() {
@@ -664,8 +732,6 @@ List<String> listOfValues=ticketResource.getResTypeValues();
 		try {
 			String QUERY = "SELECT * FROM  CBP_TKT_ROLE WHERE IS_DELETED='N'";
 			roleList = jdbcTemplate.query(QUERY, new RowMapper<TicketRole>() {
-//		String QUERY = "INSERT into CBP_TKT_ROLE(ROLE_ID,ROLE_NAME,CREATED_TS,UPDATED_TS,DELETED_TS,IS_DELETED) VALUES(? , ? , ? , ? , ? , ?)";
-
 				public TicketRole mapRow(ResultSet resultSet, int rowNum) throws SQLException {
 					TicketRole ticketRole = new TicketRole();
 					ticketRole.setRoleId(resultSet.getInt("ROLE_ID"));
@@ -683,14 +749,13 @@ List<String> listOfValues=ticketResource.getResTypeValues();
 		return roleList;
 
 	}
+
 	public void deletedRole(TicketRole ticketRole) {
 		String UPDATE_QUERY = "UPDATE CBP_TKT_ROLE_OP_TYPE set DELETED_TS = ?, IS_DELETED = ? where  ROLE_ID=?";
-		Object[] a = new Object[] {ticketRole.getDeletedDate(),ticketRole.getIsDeleted() ,ticketRole.getRoleId()  };
+		Object[] a = new Object[] { ticketRole.getDeletedDate(), ticketRole.getIsDeleted(), ticketRole.getRoleId() };
 		jdbcTemplate.update(UPDATE_QUERY, a);
-		String DELETE_QUERY = "UPDATE CBP_TKT_ROLE set DELETED_TS= ?, IS_DELETED = ? where ROLE_ID = ?";	
-				jdbcTemplate.update(DELETE_QUERY, a);
+		String DELETE_QUERY = "UPDATE CBP_TKT_ROLE set DELETED_TS= ?, IS_DELETED = ? where ROLE_ID = ?";
+		jdbcTemplate.update(DELETE_QUERY, a);
 	}
-
-	
 
 }

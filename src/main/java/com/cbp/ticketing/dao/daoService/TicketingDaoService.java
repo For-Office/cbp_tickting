@@ -20,7 +20,9 @@ public interface TicketingDaoService {
 	public List<TicketUser> login(TicketUser user);
 
 	public List<TicketUser> getTicketUserList();
-	public void deletedUser(TicketUser ticketUser) ;
+
+	public void deletedUser(TicketUser ticketUser);
+
 	public void updateUser(TicketUser ticketUser);
 
 	// TeamApp
@@ -46,14 +48,14 @@ public interface TicketingDaoService {
 	// TicketResource
 	public void createTicketRes(TicketResource ticketResource);
 
-	public List<TicketResource> getTicketResourceList();
+	//public List<TicketResource> getTicketResourceList();
 
 	public void updateTicketResource(TicketResource ticketRes);
 
 	public void deleteTicketResource(TicketResource ticketRes);
 	// TicketResourceType
 
-	public void createTicketResType(TicketResourceType ticketResourceType);
+	//public void createTicketResType(TicketResourceType ticketResourceType);
 
 	public List<TicketResourceType> getTicketResorceTypeList();
 
@@ -85,10 +87,16 @@ public interface TicketingDaoService {
 	public void createTicketUser(TicketUser ticketUser);
 
 	public List<OptionType> getListOfOptionTypes();
+
 	public void createTicketRole(TicketRole ticketRole);
+
 	public List<OptionType> getSeletedOptionTypes(TicketRole ticketRole);
+
 	public void UpdateRoleTypes(TicketRole ticketRole);
+
 	public List<TicketRole> getListRoles();
+
 	public void deletedRole(TicketRole ticketRole);
+	public List<OptionType> getIsDeleted(TicketRole ticketRole);
 
 }
