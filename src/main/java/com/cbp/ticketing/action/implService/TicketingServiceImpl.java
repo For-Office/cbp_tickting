@@ -192,8 +192,8 @@ public class TicketingServiceImpl implements TicketingService {
 		return list;
 	}
 
-	public List<TicketResource> getResNames(TicketEnvResTeamApp ticketEnvResTeamApp) {
-		List<TicketResource> list = service.getResNames(ticketEnvResTeamApp);
+	public List<TicketResourceType> getResNames(TicketEnvResTeamApp ticketEnvResTeamApp) {
+		List<TicketResourceType> list = service.getResNames(ticketEnvResTeamApp);
 		return list;
 	}
 

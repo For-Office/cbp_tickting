@@ -76,7 +76,7 @@ public interface TicketingService {
 
 	public List<TicketEnvType> getEnvTypes(TicketEnvResTeamApp ticketEnvResTeamApp);
 
-	public List<TicketResource> getResNames(TicketEnvResTeamApp ticketEnvResTeamApp);
+	public List<TicketResourceType> getResNames(TicketEnvResTeamApp ticketEnvResTeamApp);
 
 	public List<TicketResCredentials> getResCredentials(TicketResource ticketResource);
 
