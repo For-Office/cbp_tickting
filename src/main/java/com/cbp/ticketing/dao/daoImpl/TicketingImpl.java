@@ -206,7 +206,8 @@ public class TicketingImpl implements TicketingDaoService {
 		
 		String UPDATE_QUERY = "UPDATE CBP_TKT_RES_CRED SET RES_VALUE='192.168.1.9' WHERE RES_KEY='Host Name' AND RES_ID IN (SELECT RES_ID FROM CBP_TKT_RES where RES_TYPE_ID=2000)";
 						
-		Object[] a = new Object[] {  };
+		Object[] a = new Object[] { ticketResCredentials.getResValue(),ticketResCredentials.getResKey(),
+				ticketResCredentials.getResTypeId() };
 		
 		jdbcTemplate.update(UPDATE_QUERY, a);
 	}
