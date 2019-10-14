@@ -142,7 +142,7 @@ public class TicketingImpl implements TicketingDaoService {
 	
 	public List<TicketResourceType> getTicketResorceTypeList() {
 		List<TicketResourceType> ticketResTypeList = new ArrayList<TicketResourceType>();
-		String QUERY = "SELECT * FROM  CBP_TKT_RES_TYPE WHERE IS_DELETED='N'";
+		String QUERY = "SELECT * FROM  CBP_TKT_RES_TYPE WHERE RES_TYPE_ID  NOT IN(SELECT RES_TYPE_ID FROM  CBP_TKT_RES ) AND IS_DELETED='N'";
 		ticketResTypeList = jdbcTemplate.query(QUERY, new RowMapper<TicketResourceType>() {
 
 			public TicketResourceType mapRow(ResultSet resultSet, int rowNum) throws SQLException {
@@ -161,9 +161,9 @@ public class TicketingImpl implements TicketingDaoService {
 	}
 	public List<TicketResourceType> showGetTicketResourceTypeList() {
 		List<TicketResourceType> ticketResTypeList = new ArrayList<TicketResourceType>();
-		String QUERY = "SELECT cs.RES_TYPE_NAME,cs.RES_TYPE_ID,cs.CREATED_TS,cs.UPDATED_TS,cs.IS_DELETED \r\n" + 
-				"FROM CBP_TKT_RES_TYPE  cs\r\n" + 
-				"INNER JOIN CBP_TKT_RES rs\r\n" + 
+		String QUERY = "SELECT cs.RES_TYPE_NAME,cs.RES_TYPE_ID,cs.CREATED_TS,cs.UPDATED_TS,cs.IS_DELETED " + 
+				"FROM CBP_TKT_RES_TYPE  cs" + 
+				"INNER JOIN CBP_TKT_RES rs" + 
 				"ON cs.RES_TYPE_ID = rs.RES_TYPE_ID";
 		ticketResTypeList = jdbcTemplate.query(QUERY, new RowMapper<TicketResourceType>() {
 
@@ -202,14 +202,20 @@ public class TicketingImpl implements TicketingDaoService {
 		return ticketResTypeList;
 	}
 
-	public void updateTicketResourceType(TicketResCredentials ticketResCredentials) {
+	public void updateTicketResourceType(TicketResource ticketResource) {
 		
-		String UPDATE_QUERY = "UPDATE CBP_TKT_RES_CRED SET RES_VALUE='192.168.1.9' WHERE RES_KEY='Host Name' AND RES_ID IN (SELECT RES_ID FROM CBP_TKT_RES where RES_TYPE_ID=2000)";
-						
-		Object[] a = new Object[] { ticketResCredentials.getResValue(),ticketResCredentials.getResKey(),
-				ticketResCredentials.getResTypeId() };
-		
-		jdbcTemplate.update(UPDATE_QUERY, a);
+		String UPDATE_QUERY = "UPDATE CBP_TKT_RES_CRED SET RES_VALUE= ?,UPDATED_TS= ?  "
+				+ "WHERE  RES_ID IN (SELECT RES_ID FROM CBP_TKT_RES where RES_TYPE_ID= ?) AND RES_KEY= ?";	
+		List<Object[]> inputLists = new ArrayList<Object[]>();
+		TicketResCredentials ticketResCredentials = ticketResource.getTicketResCredentials();
+		Map<String,String> keysAndValues = ticketResource.getKeysAndValues();
+		for (Map.Entry<String,String> entry : keysAndValues.entrySet())  {
+			String key =entry.getKey();
+			String value =entry.getValue();
+			Object[] tmp = new Object[] { value, ticketResCredentials.getModifiedDate(),ticketResource.getResTypeId(),key};
+			inputLists.add(tmp);
+		}
+	jdbcTemplate.batchUpdate(UPDATE_QUERY, inputLists);
 	}
 
 	public void deleteTicketResourceType(TicketResourceType ticketResourceType) {

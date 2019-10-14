@@ -154,13 +154,17 @@ public class TicketingServiceImpl implements TicketingService {
 		List<TicketResourceType> list = service.showGetTicketResourceTypeList();
 		return list;
 	}
-	public void updateTicketResourceType(TicketResCredentials ticketResCredentials) {
+	public void updateTicketResourceType(TicketResource ticketResource) {
+		TicketResCredentials ticketResCredentials=new TicketResCredentials();
+		
 		ticketResCredentials.setModifiedDate(new Date());
-		service.updateTicketResourceType(ticketResCredentials);
+		ticketResource.setTicketResCredentials(ticketResCredentials);
+		service.updateTicketResourceType(ticketResource);
 	}
 
 	public void deleteTicketResourceType(TicketResourceType ticketResourceType) {
 		ticketResourceType.setDeletedDate(new Date());
+		ticketResourceType.setIsDeleted("Y");
 		service.deleteTicketResourceType(ticketResourceType);
 	}
 

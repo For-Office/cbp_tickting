@@ -63,7 +63,7 @@ public interface TicketingService {
 
 	public List<TicketResourceType> getTicketResorceTypeList();
 
-	public void updateTicketResourceType(TicketResCredentials ticketResCredentials);
+	public void updateTicketResourceType(TicketResource ticketResource);
 
 	public void deleteTicketResourceType(TicketResourceType ticketResType);
 	public List<TicketResourceType> showGetTicketResourceTypeList();

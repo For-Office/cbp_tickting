@@ -204,10 +204,10 @@ public class TicketingController {
 
 	}
 
-	@PostMapping(path = "/update")
-	public ResponseEntity<?> updateTicketResourceType(@RequestBody TicketResCredentials ticketResCredentials) {
+	@PostMapping(path = "/updateTicketResourceType")
+	public ResponseEntity<?> updateTicketResourceType(@RequestBody TicketResource ticketResource) {
 		ResponseBodyHelper responseBody = new ResponseBodyHelper();
-		ticket.updateTicketResourceType(ticketResCredentials);
+		ticket.updateTicketResourceType(ticketResource);
 		responseBody.setStatusCode(String.valueOf(HttpStatus.OK));
 		responseBody.setReqStatus("success");
 		responseBody.setMessage("updated successfuly");
