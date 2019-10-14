@@ -10,7 +10,7 @@ public class TicketResourceType {
 	private Date modifiedDate;
 	private Date deletedDate;
 	private String isDeleted;
-
+	private TicketResCredentials ticketResCredentials;
 	public Date getDeletedDate() {
 		return deletedDate;
 	}
@@ -57,6 +57,20 @@ public class TicketResourceType {
 
 	public void setResTypeName(String resTypeName) {
 		this.resTypeName = resTypeName;
+	}
+
+	/**
+	 * @return the ticketResCredentials
+	 */
+	public TicketResCredentials getTicketResCredentials() {
+		return ticketResCredentials;
+	}
+
+	/**
+	 * @param ticketResCredentials the ticketResCredentials to set
+	 */
+	public void setTicketResCredentials(TicketResCredentials ticketResCredentials) {
+		this.ticketResCredentials = ticketResCredentials;
 	}
 
 }

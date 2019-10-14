@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.cbp.ticketing.Utility.ReUtils;
 import com.cbp.ticketing.action.service.TicketingService;
 import com.cbp.ticketing.dao.daoService.TicketingDaoService;
+import com.cbp.ticketing.exception.TicketingException;
 import com.cbp.ticketing.model.OptionType;
 import com.cbp.ticketing.model.TicketApp;
 import com.cbp.ticketing.model.TicketEnvResTeamApp;
@@ -29,7 +30,7 @@ public class TicketingServiceImpl implements TicketingService {
 	TicketingDaoService service;;
 
 	public List<TicketUser> login(TicketUser user) {
-		user.setPassword(ReUtils.encryptPassword(user.getPassword()));
+		// user.setPassword(ReUtils.encryptPassword(user.getPassword()));
 		List<TicketUser> users = service.login(user);
 		return users;
 	}
@@ -101,7 +102,7 @@ public class TicketingServiceImpl implements TicketingService {
 	 * service.deleteTicketTeam(ticketTeam); }
 	 */
 //TicketRes 
-	public void createTicketRes(TicketResource ticketResource) {
+	public void createTicketRes(TicketResource ticketResource) throws TicketingException  {
 		ticketResource.setCreatedDate(new Date());
 		ticketResource.setModifiedDate(new Date());
 		ticketResource.setDeletedDate(new Date());
@@ -120,32 +121,42 @@ public class TicketingServiceImpl implements TicketingService {
 
 	/* */
 
-	public void updateTicketResource(TicketResource ticketRes) {
-		ticketRes.setModifiedDate(new Date());
-		service.updateTicketResource(ticketRes);
-	}
-
-	public void deleteTicketResource(TicketResource ticketRes) {
-		service.deleteTicketResource(ticketRes);
-	}
+	/*
+	 * public void updateTicketResource(TicketResource ticketRes) {
+	 * ticketRes.setModifiedDate(new Date());
+	 * service.updateTicketResource(ticketRes); }
+	 * 
+	 * public void deleteTicketResource(TicketResource ticketRes) {
+	 * service.deleteTicketResource(ticketRes); }
+	 */
 
 //TicketResType
-	/*public void createTicketResType(TicketResourceType ticketResourceType) {
-		ticketResourceType.setCreatedDate(new Date());
-		ticketResourceType.setModifiedDate(new Date());
-		ticketResourceType.setDeletedDate(new Date());
-		ticketResourceType.setIsDeleted("N");
-		service.createTicketResType(ticketResourceType);
-	}*/
+	/*
+	 * public void createTicketResType(TicketResourceType ticketResourceType) {
+	 * ticketResourceType.setCreatedDate(new Date());
+	 * ticketResourceType.setModifiedDate(new Date());
+	 * ticketResourceType.setDeletedDate(new Date());
+	 * ticketResourceType.setIsDeleted("N");
+	 * service.createTicketResType(ticketResourceType); }
+	 */
 
 	public List<TicketResourceType> getTicketResorceTypeList() {
 		List<TicketResourceType> list = service.getTicketResorceTypeList();
 		return list;
 	}
 
-	public void updateTicketResourceType(TicketResourceType ticketResType) {
-		ticketResType.setModifiedDate(new Date());
-		service.updateTicketResourceType(ticketResType);
+	public List<TicketResCredentials> showupdateTicketResourceType(TicketResourceType ticketResourceType) {
+
+		List<TicketResCredentials> list = service.showupdateTicketResourceType(ticketResourceType);
+		return list;
+	}
+	public List<TicketResourceType> showGetTicketResourceTypeList(){
+		List<TicketResourceType> list = service.showGetTicketResourceTypeList();
+		return list;
+	}
+	public void updateTicketResourceType(TicketResCredentials ticketResCredentials) {
+		ticketResCredentials.setModifiedDate(new Date());
+		service.updateTicketResourceType(ticketResCredentials);
 	}
 
 	public void deleteTicketResourceType(TicketResourceType ticketResourceType) {
@@ -270,8 +281,10 @@ public class TicketingServiceImpl implements TicketingService {
 		ticketRole.setIsDeleted("Y");
 		service.deletedRole(ticketRole);
 	}
-	public List<OptionType> getIsDeleted(TicketRole ticketRole){
+
+	public List<OptionType> getIsDeleted(TicketRole ticketRole) {
 		List<OptionType> list = service.getIsDeleted(ticketRole);
 		return list;
 	}
+
 }

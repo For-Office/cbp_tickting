@@ -1,7 +1,13 @@
 package com.cbp.ticketing.common;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
+
+import com.cbp.ticketing.exception.REErrorCodes;
+
 
 @Repository
 public class ErrorCodes {
@@ -274,7 +280,18 @@ public class ErrorCodes {
 	public void setERRORS_DELETEAPPLICATION_SUCCES(String eRRORS_DELETEAPPLICATION_SUCCES) {
 		ERRORS_DELETEAPPLICATION_SUCCES = eRRORS_DELETEAPPLICATION_SUCCES;
 	}
+	public static Map<REErrorCodes, String> exceptionErrorCodeMap = new HashMap<REErrorCodes, String>();
+	public static final String UNKNOWN_ERROR = "error.unknown";
+	public static String getErrorCodeFromExceptionCode(REErrorCodes reErrorCode) {
+		String errorCode = exceptionErrorCodeMap.get(reErrorCode);
 
+		if (errorCode == null) {
+			errorCode = UNKNOWN_ERROR;
+		}
+
+		return errorCode;
+	}
+	
 	/*
 	 * public static final String ERRORS_LOOKUP_REQUIRED = "errors.lookup.required";
 	 * public static final String ERRORS_USERNAME_REQUIRED =

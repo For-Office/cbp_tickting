@@ -2,18 +2,24 @@ package com.cbp.ticketing.model;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class TicketResource {
 	private int resId;
-	private String resName;
+	private String resTypeName;
 	private int resTypeId;
 	private Date createdDate;
 	private Date modifiedDate;
 	private Date deletedDate;
 	private String isDeleted;
 	private TicketResCredentials ticketResCredentials;
-	private List<String> resTypeKeys;
-	private List<String> resTypeValues;
+	private Map<String,String> keysAndValues;
+	public Map<String, String> getKeysAndValues() {
+		return keysAndValues;
+	}
+	public void setKeysAndValues(Map<String, String> keysAndValues) {
+		this.keysAndValues = keysAndValues;
+	}
 	private List resNames;
 	private List<Integer> resTypeIds;
 	public Date getCreatedDate() {
@@ -34,12 +40,7 @@ public class TicketResource {
 	public void setResId(int resId) {
 		this.resId = resId;
 	}
-	public String getResName() {
-		return resName;
-	}
-	public void setResName(String resName) {
-		this.resName = resName;
-	}
+	
 	public int getResTypeId() {
 		return resTypeId;
 	}
@@ -101,28 +102,16 @@ public class TicketResource {
 		this.ticketResCredentials = ticketResCredentials;
 	}
 	/**
-	 * @return the resTypeKeys
+	 * @return the resTypeName
 	 */
-	public List<String> getResTypeKeys() {
-		return resTypeKeys;
+	public String getResTypeName() {
+		return resTypeName;
 	}
 	/**
-	 * @param resTypeKeys the resTypeKeys to set
+	 * @param resTypeName the resTypeName to set
 	 */
-	public void setResTypeKeys(List<String> resTypeKeys) {
-		this.resTypeKeys = resTypeKeys;
-	}
-	/**
-	 * @return the resTypeValues
-	 */
-	public List<String> getResTypeValues() {
-		return resTypeValues;
-	}
-	/**
-	 * @param resTypeValues the resTypeValues to set
-	 */
-	public void setResTypeValues(List<String> resTypeValues) {
-		this.resTypeValues = resTypeValues;
+	public void setResTypeName(String resTypeName) {
+		this.resTypeName = resTypeName;
 	}
 	
 	

@@ -3,6 +3,7 @@ package com.cbp.ticketing.dao.daoService;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.cbp.ticketing.exception.TicketingException;
 import com.cbp.ticketing.model.OptionType;
 import com.cbp.ticketing.model.TicketApp;
 import com.cbp.ticketing.model.TicketEnvResTeamApp;
@@ -46,20 +47,23 @@ public interface TicketingDaoService {
 	 */
 
 	// TicketResource
-	public void createTicketRes(TicketResource ticketResource);
+	public void createTicketRes(TicketResource ticketResource) throws TicketingException;
 
-	//public List<TicketResource> getTicketResourceList();
+	// public List<TicketResource> getTicketResourceList();
 
-	public void updateTicketResource(TicketResource ticketRes);
-
-	public void deleteTicketResource(TicketResource ticketRes);
+	/*
+	 * public void updateTicketResource(TicketResource ticketRes);
+	 * 
+	 * public void deleteTicketResource(TicketResource ticketRes);
+	 */
 	// TicketResourceType
 
-	//public void createTicketResType(TicketResourceType ticketResourceType);
-
+	// public void createTicketResType(TicketResourceType ticketResourceType);
+	public List<TicketResCredentials> showupdateTicketResourceType(TicketResourceType ticketResourceType);
+	public List<TicketResourceType> showGetTicketResourceTypeList();
 	public List<TicketResourceType> getTicketResorceTypeList();
 
-	public void updateTicketResourceType(TicketResourceType ticketResType);
+	public void updateTicketResourceType(TicketResCredentials ticketResCredentials);
 
 	public void deleteTicketResourceType(TicketResourceType ticketResType);
 
@@ -97,6 +101,7 @@ public interface TicketingDaoService {
 	public List<TicketRole> getListRoles();
 
 	public void deletedRole(TicketRole ticketRole);
+
 	public List<OptionType> getIsDeleted(TicketRole ticketRole);
 
 }
