@@ -162,8 +162,8 @@ public class TicketingImpl implements TicketingDaoService {
 	public List<TicketResourceType> showGetTicketResourceTypeList() {
 		List<TicketResourceType> ticketResTypeList = new ArrayList<TicketResourceType>();
 		String QUERY = "SELECT cs.RES_TYPE_NAME,cs.RES_TYPE_ID,cs.CREATED_TS,cs.UPDATED_TS,cs.IS_DELETED " + 
-				"FROM CBP_TKT_RES_TYPE  cs" + 
-				"INNER JOIN CBP_TKT_RES rs" + 
+				"FROM CBP_TKT_RES_TYPE  cs " + 
+				"INNER JOIN CBP_TKT_RES rs " + 
 				"ON cs.RES_TYPE_ID = rs.RES_TYPE_ID";
 		ticketResTypeList = jdbcTemplate.query(QUERY, new RowMapper<TicketResourceType>() {
 
